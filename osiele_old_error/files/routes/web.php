@@ -1,0 +1,249 @@
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+//Auth::routes();
+
+
+//protect routes
+Route::group(['middleware' => 'auth'], function(){
+
+    Route::get('/home', 'HomeController@index')->name('home');
+
+//Fresher upload
+Route::post('studentmanager/importfresher', 'StudentManagerController@import');
+Route::get('studentmanager/fresher', 'StudentManagerController@fresherindex');
+
+Route::get('promote300', 'StudentManagerController@promote300');
+Route::post('studentmanager/search', 'StudentManagerController@searchStudent');
+Route::get('search', 'StudentManagerController@searchview');
+Route::get('promote', 'StudentManagerController@promoteview');
+Route::post('studentmanager/promote', 'StudentManagerController@promote');
+Route::post('studentmanager/deletestudent', 'StudentManagerController@deleteStudent');
+Route::resource('studentmanager', 'StudentManagerController');
+
+Route::get('matric/generate', 'MatricController@generateMatric');
+Route::get('matric/generated', 'MatricController@generated');
+Route::resource('matric', 'MatricController');
+
+Route::get('schoolmanager/delete', 'SchoolController@deleteSchool');
+Route::resource('schoolmanager', 'SchoolController');
+
+Route::post('course/search', 'CourseController@searchCourse');
+Route::get('course/delete', 'CourseController@deleteCourse');
+Route::resource('course', 'CourseController');
+
+Route::resource('sessionmanager', 'SessionController');
+
+Route::resource('usermanager', 'UserController');
+
+Route::post('staffmanager/search', 'StaffController@searchLecturer');
+Route::resource('staffmanager', 'StaffController');
+
+Route::get('subjectcombinationindex', 'DepartmentController@subjectcombinationIndex');
+Route::get('createcombinationindex', 'DepartmentController@createcombination');
+Route::post('createcombination', 'DepartmentController@subjectcombinationNew');
+
+Route::post('departmentmanager/search', 'DepartmentController@searchDept');
+Route::resource('departmentmanager', 'DepartmentController');
+
+//course registration
+Route::post('courseregistration/search', 'CourseRegistrationController@search');
+Route::post('courseregistration/addcourse', 'CourseRegistrationController@addcourse');
+Route::post('courseregistration/deletecourse', 'CourseRegistrationController@deletecourse');
+
+Route::post('courseregistration/print', 'CourseRegistrationController@printcourse');
+Route::get('courseregistration/printindex', 'CourseRegistrationController@printindex');
+Route::get('courseregistration/printbysessionindex', 'CourseRegistrationController@printbysessionindex');
+Route::post('courseregistration/printbysession', 'CourseRegistrationController@printcoursebysession');
+
+Route::get('courseregistration/searchbysession', 'CourseRegistrationController@searchbysession');
+Route::get('courseregistration/sessionindex', 'CourseRegistrationController@coursesessionindex');
+Route::resource('courseregistration', 'CourseRegistrationController');
+
+//curriculum
+Route::get('CurriculumManager/search', 'CurriculumController@search');
+Route::get('CurriculumManager/deletecourse', 'CurriculumController@deletecourse');
+Route::post('CurriculumManager/newcurriculum', 'CurriculumController@newcurriculum');
+
+Route::get('courseassignment/remove', 'CourseAssignmentController@RemoveLecturer');
+Route::post('courseassignment/search', 'CourseAssignmentController@SearchAssignment');
+Route::post('courseassignment/assign', 'CourseAssignmentController@AssignLecturer');
+Route::post('courseassignment/showassign', 'CourseAssignmentController@ShowCourseAssignment');
+Route::resource('courseassignment', 'CourseAssignmentController');
+
+//begin json ajax search for faculty, deparment and subject combinations
+Route::get('CurriculumManager/searches','CurriculumController@jsfaculties');
+Route::get('/json-departments','CurriculumController@jsdepartments');
+Route::get('/json-programmes', 'CurriculumController@jsprogrammes');
+
+//Route::get('/json-session', 'CurriculumController@search');
+//end of json ajax search
+
+Route::resource('CurriculumManager', 'CurriculumController');
+
+/* Route::post('mms1/search', 'Mms1Controller@search');
+Route::resource('mms1', 'Mms1Controller'); */
+
+Route::post('graduate/search', 'GraduateController@search');
+Route::resource('graduates', 'GraduateController');
+
+Route::post('summary/search', 'Mms1Controller@search');
+Route::post('summary/print', 'Mms1Controller@print');
+Route::resource('summary', 'Mms1Controller');
+
+Route::post('mmsgraduating/search', 'MmsGraduatingController@search');
+Route::post('mmsgraduating/print', 'MmsGraduatingController@print');
+Route::resource('mmsgraduating', 'MmsGraduatingController');
+
+Route::post('summarypassed/search', 'SummaryPassedController@search');
+Route::post('summarypassed/print', 'SummaryPassedController@print');
+Route::resource('summarypassed', 'SummaryPassedController');
+
+Route::post('mms2/search', 'Mms2Controller@search');
+Route::resource('mms2', 'Mms2Controller');
+
+Route::post('detailedresult2/search', 'DetailedResult2Controller@search');
+Route::post('detailedresult2/print', 'DetailedResult2Controller@print');
+Route::resource('detailedresult2', 'DetailedResult2Controller');
+
+Route::post('detailedresult/search', 'DetailedResultController@search');
+Route::post('detailedresult/print', 'DetailedResultController@print');
+Route::resource('detailedresult', 'DetailedResultController');
+
+Route::post('markmastersheet/search', 'MarkmastersheetController@search');
+Route::post('markmastersheet/print', 'MarkmastersheetController@print');
+Route::resource('markmastersheet', 'MarkmastersheetController');
+
+Route::get('emsupdate', 'EMSController@updatesubcom');
+//Exam mark sheet (EMS 1 - 3)
+Route::post('ems2/search', 'EMSController@searchems2');
+Route::get('ems2', 'EMSController@index2');
+//Route::resource('ems', 'EMSController');
+
+Route::post('ems3/search', 'EMSController@searchems3');
+Route::get('ems3', 'EMSController@index3');
+
+Route::post('ems4/search', 'EMSController@searchems4');
+Route::get('ems4', 'EMSController@index4');
+
+Route::post('ems/search', 'EMSController@search');
+Route::resource('ems', 'EMSController');
+
+//Statistics
+Route::get('statistics/lecturerlist', 'StatsController@lecturerinfoindex');
+Route::post('statistics/getlecturerlist', 'StatsController@lecturerinfo');
+
+Route::get('statistics/courselist', 'StatsController@courselist');
+
+Route::get('statistics/studentinfo', 'StatsController@studentinfoindex');
+Route::get('statistics/getinfo', 'StatsController@studentinfo');
+
+Route::post('statistics/search', 'StatsController@search');
+Route::get('statistics/studentlist', 'StatsController@studentlistindex');
+Route::post('statistics/getlist', 'StatsController@studentlist');
+Route::resource('statistics', 'StatsController');
+
+/* //Fresher upload
+Route::post('fresher/importfresher', 'FresherController@import');
+Route::get('fresher/home', 'FresherController@fresherindex');
+Route::resource('fresher', 'FresherController');
+ */
+
+//Add/Delete:: rectify result controller
+Route::get('lecturer/previewdownload', 'RectifyResultController@previewdownload');
+Route::post('rectify/search', 'RectifyResultController@search');
+Route::post('rectify/updated', 'RectifyResultController@updated');
+Route::resource('rectify', 'RectifyResultController');
+
+//Route::resource('resultviewer', 'ResultviewController');
+//Route::get('resultviewer', 'ResultviewController@index');
+Route::get('esaviewer/esaresults', 'ESAController@index');
+Route::post('esaviewer/getesaresults', 'ESAController@getESA');
+Route::resource('esaviewer', 'ESAController');
+
+Route::get('resultviewer/', 'ResultviewController@index');
+Route::post('resultviewer/search', 'ResultviewController@search');
+
+//json routes
+Route::get('resultviewer/','ResultviewController@sessions');
+//Route::get('resultviewer/json-results','ResultviewController@results');
+
+//Reset upload
+Route::get('resetuploadindex', 'ResultviewController@resetuploadindex');
+Route::post('resetupload', 'ResultviewController@resetupload');
+
+//result slip
+Route::get('resultslipindex', 'ResultviewController@resultslipindex');
+Route::post('resultslip', 'ResultviewController@resultslip');
+
+//statement of result
+Route::get('resultstmtindex', 'ResultviewController@resultstmtindex');
+Route::post('resultstmt', 'ResultviewController@resultstmt');
+
+//Suspension Cases
+Route::post('suspension/effectprobation', 'SuspensionController@placeonprobation');
+Route::get('suspension/probation', 'SuspensionController@probation');
+Route::post('suspension/suspend', 'SuspensionController@suspend');
+Route::resource('suspension', 'SuspensionController');
+
+//student pin
+Route::get('pin/searchpin', 'PinController@searchpin');
+Route::get('printpin', 'PinController@printpin');
+Route::get('generatepinpage', 'PinController@generatePinIndex');
+Route::post('generatepin', 'PinController@generatePin');
+Route::resource('pin', 'PinController');
+
+//transcript
+Route::get('transcriptindex', 'ResultviewController@transcriptindex');
+Route::post('transcript', 'ResultviewController@transcript');
+
+//score range
+Route::get('scorerange', 'ResultviewController@scorerangeindex');
+Route::post('scoreranges', 'ResultviewController@scoreranges');
+
+//uploaded score
+Route::get('uploadedscore', 'ResultviewController@uploadedscoreindex');
+Route::post('uploadedscores', 'ResultviewController@uploadedscore');
+
+Route::get('lectureins', 'ResultviewController@insertlecturer');
+
+//Activity Schedule
+Route::get('activityschedule/delete', 'ActivityController@ActivityScheduleDelete');
+Route::get('activityschedule/create', 'ActivityController@ActivityScheduleNew');
+Route::get('activityschedule/createnew', 'ActivityController@ActivityScheduleCreate');
+Route::get('activityschedule', 'ActivityController@ActivityScheduleIndex');
+
+//Activity
+Route::get('activity/update', 'ActivityController@ActivityUpdate');
+Route::get('activity/edit', 'ActivityController@ActivityEdit');
+Route::get('activity/delete', 'ActivityController@deleteActivity');
+Route::get('activity/addnew', 'ActivityController@AddNew');
+Route::resource('activity', 'ActivityController');
+
+
+
+Route::get('/dynamic_dependent', 'AjaxController@index');
+
+Route::post('dynamic_dependent/fetch', 'AjaxController@fetch')->name('dynamicdependent.fetch');
+
+});//end of route group for middleware
+
+Auth::routes();
+Route::post('/login/custom',[
+    'uses' =>'LoginController@login',
+    'as' => 'login.custom'
+]);
