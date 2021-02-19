@@ -154,7 +154,7 @@
                 <tr style="border-bottom: 1.5px dotted #000;">
                     <td style="height: 2.5px;"></td><td></td><td></td><td></td><td></td><td></td><td></td>
                   </tr>
-                  <?php $ng =""; ?>
+                  <?php $ng =""; $allcurtcp = 0; $allcurcgpa=0; $allcuralltnups = 0; $allcurtnuaddup = 0;?>
                 @foreach($deptsummary as $index=>$allsummary)
                 <tr>
                     <td >{{$allsummary->dname}}</td>
@@ -217,7 +217,10 @@
                     $cumcgpa = 0;
                     if($cumtcp > 0 && $cumtnu > 0){
                     $cumcgpa = number_format($cumtcp/$cumtnu, 2);
-                    } 
+                    }
+                    $allcurtcp +=$curtcp;
+                    $allcurtnuaddup +=$curtnuaddup;
+                    $allcuralltnups +=$curalltnups; 
                     ?>
 
                     
@@ -396,15 +399,15 @@ color: red;
           $cumtnu = $curtnuaddup;
           $cumalltnup = $curalltnups;
           $cumcgpa = 0;
-          if($cumtcp > 0 && $cumtnu > 0){
-          $cumcgpa = number_format($cumtcp/$cumtnu, 2);
+          if($allcurtcp > 0 && $allcurtnuaddup > 0){
+          $cumcgpa = number_format($allcurtcp/$allcurtnuaddup, 2);
           } 
           ?>
 
           
-          <td align="right">{{$cumtcp}}</td>
-          <td align="right">{{$cumtnu}}</td>
-          <td align="right">{{$cumalltnup}}</td>
+          <td align="right">{{$allcurtcp}}</td>
+          <td align="right">{{$allcurtnuaddup}}</td>
+          <td align="right">{{$allcuralltnups}}</td>
           <td align="right">{{$cumcgpa}}</td>
           <td style="padding: 0 0 0 20px;">
               @if($cumcgpa >= 4.5)
