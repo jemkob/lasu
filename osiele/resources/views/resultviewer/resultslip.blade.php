@@ -216,7 +216,7 @@
                         </table>
                         {{-- @if(!($resultslip[0]->Level == 100) && !($resultslip[0]->Semester == 1)) --}}
                         <?php 
-                          $rescollection = collect($summaryco);
+                          $rescollection = collect($summaryco)->where('subjectvalueco', '!=', 'R');
                             $resfiltered = $rescollection->sortKeys()->unique('subjectcodeco');
                             $resfiltered->all();
                           
@@ -297,7 +297,7 @@
                                 <td class="topbottomborder">{{$co->subjectnameco}}</td>
                                 <td class="topbottomborder">{{$co->subjectvalueco}}</td>
                                 <td class="topbottomborder">{{$co->subjectunitco}}</td>
-                                <td class="topbottomborder">OUTSTANDING</td>
+                                <td class="topbottomborder">NOT TAKEN</td>
                             </tr>
                             @endforeach
                             

@@ -162,6 +162,9 @@ Route::get('ems3', 'EMSController@index3');
 Route::post('ems4/search', 'EMSController@searchems4');
 Route::get('ems4', 'EMSController@index4');
 
+Route::post('attendance', 'EMSController@attendance');
+Route::get('attendance', 'EMSController@attendance');
+
 Route::post('ems/search', 'EMSController@search');
 Route::resource('ems', 'EMSController');
 

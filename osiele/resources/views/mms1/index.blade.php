@@ -579,11 +579,21 @@
                                 //outstanding start
                                 $set1='';
                                 $set2='';
-                                if($semester==1){
-                                $set1 = collect($compulsorycourses)->where('subjectlevel', $level)->where('semester', $semester);
-                                }else{
-                                $set1 = collect($compulsorycourses)->where('subjectlevel', $level);
+                                if($level < 400){
+                                  if($semester==1){
+                                    $set1 = collect($compulsorycourses)->where('subjectlevel', $level)->where('semester', $semester);
+                                    }else{
+                                    $set1 = collect($compulsorycourses)->where('subjectlevel', $level);
+                                    }
+                                } else {
+                                  if($semester==1){
+                                    $set1 = collect($compulsorycourses)->where('subjectlevel', 300);
+                                    // $set1 = collect($compulsorycourses)->where('subjectlevel', 300)->where('semester', $semester);
+                                    }else{
+                                    $set1 = collect($compulsorycourses)->where('subjectlevel', 300);
+                                    }
                                 }
+                                
                                 // $set1 = collect($compulsorycourses)->where('subjectlevel', $level)->where('semester', $semester); // Contents omitted for brevity
                                 //  $set1 = $set1->reject(function ($value, $key) { return $value->subjectvalueco = 'E'; });
                                 $set2 = collect($resfiltered); // Contents omitted for brevity
@@ -601,7 +611,13 @@
 
                                 $set1p='';
                                 $set2p='';
-                                $set1p = collect($compulsorycourses)->where('subjectlevel', $level-100); // Contents omitted for brevity
+                                if($level < 400){
+                                  $set1p = collect($compulsorycourses)->where('subjectlevel', $level-100); 
+                                } else {
+                                  $set1p = collect($compulsorycourses)->where('subjectlevel', 200); 
+                                  
+                                }
+                                // Contents omitted for brevity
                                 //  $set1 = $set1->reject(function ($value, $key) { return $value->subjectvalueco = 'E'; });
                                 // dd($set1p);
                                 $set2p = collect($resfilteredp); // Contents omitted for brevity
@@ -685,6 +701,7 @@
                                 }
                               } */
                                 ?>
+                                <!-- @dump($resfiltered) -->
                               </td>
                               </tr>
                             

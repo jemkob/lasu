@@ -391,57 +391,44 @@ $results = DB::table('results')
 
             if(isset($bedas) && !empty($bedas)){
                 if($bedas=='beda'){
-                        $bed='BES';
-                }else{
                         $bed='BEA';
+                }else{
+                        $bed='BES';
                 }
-                $compulsorycourses = DB::table('allcombineds')
-                ->leftjoin('subjects', 'allcombineds.subjectid', '=', 'subjects.subjectid')
+                $compulsorycourses300 = DB::table('allcombinedcourses')
+                ->leftjoin('subjects', 'allcombinedcourses.subjectid', '=', 'subjects.subjectid')
                 ->select('subjects.subjectcode as subjectcodeco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', 'subjects.subjectlevel as subjectlevel', 'subjects.semester as semester')
                 ->where('SubjectCombineID', $programme)
-                ->where('CurricullumID', 1)
+                ->where('sessionid', $session01)
                 ->where('subjects.SubjectLevel', 300)
                 // ->where('subjects.Semester', $semester01)
                 ->where('subjects.subjectunit', 'C')
-                ->where('subjects.subjectcode', 'not like', $bed.'%')
-                ->get();
+                ->where('subjects.subjectcode', 'like', $bed.'%');
         } else {
-        $compulsorycourses = DB::table('allcombineds')
-        ->leftjoin('subjects', 'allcombineds.subjectid', '=', 'subjects.subjectid')
+        $compulsorycourses300 = DB::table('allcombinedcourses')
+        ->leftjoin('subjects', 'allcombinedcourses.subjectid', '=', 'subjects.subjectid')
         ->select('subjects.subjectcode as subjectcodeco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', 'subjects.subjectlevel as subjectlevel', 'subjects.semester as semester')
         ->where('SubjectCombineID', $programme)
-        ->where('CurricullumID', 1)
+        ->where('sessionid', $session01)
         ->where('subjects.SubjectLevel', 300)
         // ->where('subjects.Semester', $semester01)
-        ->where('subjects.subjectunit', 'C')
-        ->get();
+        ->where('subjects.subjectunit', 'C');
         }
         // return $compulsorycourses;
         //200 level
-        // $compulsorycourses = DB::table('allcombineds')
-        // ->leftjoin('subjects', 'allcombineds.subjectid', '=', 'subjects.subjectid')
-        // ->select('subjects.subjectcode as subjectcodeco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', 'subjects.subjectlevel as subjectlevel', 'subjects.semester as semester')
-        // ->where('SubjectCombineID', $programme)
-        // ->where('CurricullumID', 1)
-        // // ->where('subjects.SubjectLevel', $level01-100)
-        // // ->where('subjects.Semester', $semester01)
-        // ->where('subjects.subjectunit', 'C')
-        // // ->union($compulsorycourses300)
-        // ->get();
-
-        /*//100, 200, 300 level
-         $compulsorycourses = DB::table('allcombineds')
-        ->leftjoin('subjects', 'allcombineds.subjectid', '=', 'subjects.subjectid')
-        ->select('subjects.subjectcode as subjectcodeco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco')
+        $compulsorycourses = DB::table('allcombinedcourses')
+        ->leftjoin('subjects', 'allcombinedcourses.subjectid', '=', 'subjects.subjectid')
+        ->select('subjects.subjectcode as subjectcodeco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', 'subjects.subjectlevel as subjectlevel', 'subjects.semester as semester')
         ->where('SubjectCombineID', $programme)
-        ->where('CurricullumID', 1)
-        ->where('subjects.SubjectLevel', $level01-200)
+        ->where('sessionid', $session01)
+        ->where('subjects.SubjectLevel', 200)
         // ->where('subjects.Semester', $semester01)
         ->where('subjects.subjectunit', 'C')
-        ->unionall($compulsorycourses200)
+        // ->where('subjects.subjectcode', 'not like', $bed.'%')
         ->unionall($compulsorycourses300)
         ->get();
- */
+
+        
         $resultaddup2 = DB::table('results')
         ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
         ->select('results.matricno as matricno', 'subjects.subjectcode as subjectcodeco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco')

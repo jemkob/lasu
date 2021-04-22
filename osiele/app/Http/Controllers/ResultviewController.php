@@ -172,16 +172,20 @@ class ResultviewController extends Controller
         $sessions = DB::table('sessions')->get();
 
         //compulsory courses
-        $compulsorycourses = DB::table('allcombineds')
-        ->leftjoin('subjects', 'allcombineds.subjectid', '=', 'subjects.subjectid')
+        $compulsorycourses = DB::table('allcombinedcourses')
+        ->leftjoin('subjects', 'allcombinedcourses.subjectid', '=', 'subjects.subjectid')
         ->select('subjects.subjectcode as subjectcodeco', 'subjects.subjectname as subjectnameco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', 'subjects.subjectlevel as subjectlevel', 'subjects.semester as semester')
         ->where('SubjectCombineID', $resultslip[0]->SubjectCombinID)
-        ->where('CurricullumID', 2)
-        // ->where('subjects.SubjectLevel', $level)
-        // ->where('subjects.Semester', $semester)
-        ->where('subjects.subjectunit', 'C')
+        // ->where('CurricullumID', 2)
+        ->where('subjects.SubjectLevel', $level)
+        ->where('sessionid', $session)
+        ->where('subjects.Semester', $semester)
+        ->where('subjects.subjectunit','!=', 'R')
+        // ->where('subjects.subjectunit', 'E')
         ->orderby('subjects.subjectcode')
         ->get();
+
+        
 
         if(($level=='100') && ($semester =='1')){
 

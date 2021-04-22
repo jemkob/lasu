@@ -142,7 +142,7 @@ class CourseRegistrationController extends Controller
         ->orderby('subjectcode')
         ->get();
         }
-
+        // return redirect()->back();
         return view('student.courseregistration')->with('compulsorycourses', $compulsorycourses)->with('registeredcourses', $registeredcourses)->with('carryover', $carryover)->with('CurrentCourses', $CurrentCourses)->with('student', $student);
     }
     public function getMinMax(){

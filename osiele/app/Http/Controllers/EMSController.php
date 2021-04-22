@@ -129,6 +129,8 @@ class EMSController extends Controller
         
      }
 
+    
+
      public function searchems4(Request $request)
      {
         
@@ -142,10 +144,11 @@ class EMSController extends Controller
 
         $results = DB::table('results')
         ->leftjoin('departments','results.departmentid', '=', 'departments.departmantid')
+        ->leftjoin('students','results.studentid', '=', 'students.studentid')
         ->leftjoin('subjectcombinations', 'results.subjectcombinid', '=', 'subjectcombinations.subjectcombinid')
         ->where('sessionid', $sessions->SessionID)
         ->where('subjectid', $course)
-        ->orderby('matricno')
+        ->orderby('results.matricno')
         ->get();
         // return $results;
         // $theschool = DB::table('faculties')->where('facultyid', $faculty)->first();
@@ -159,6 +162,51 @@ class EMSController extends Controller
         $subject = DB::table('subjects')->orderby('SubjectCode')->get();
      
         return view('ems.ems4')->with('faculties', $faculties)->with('subject', $subject)->with('results', $results)->with('thesession', $thesession)->with('subjectlevel', $subjectlevel); 
+        
+     }
+
+     public function attendanceIndex()
+     {
+         $faculties = DB::table('faculties')->get();
+         $sessions = DB::table('sessions')->orderby('SessionID', 'desc')->get();
+         $subject = DB::table('subjects')->orderby('SubjectCode')->get();
+         
+         //$programmes = DB::table('subjectcombinations')->get();
+           
+     return view('ems.attendance')->with('sessions', $sessions)->with('subject', $subject);
+      }
+      
+     public function attendance(Request $request)
+     {
+        
+        // Gets the query string from our form submission 
+        // $faculty = $request->input('faculties');
+        $departments = $request->input('departments');
+        $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
+        $course = $request->input('course');
+        // $dept = DB::table('departments')->select('DepartmantID')->where('FacultyID', $faculty)->get();
+        //return $dept;
+
+        $results = DB::table('results')
+        ->leftjoin('departments','results.departmentid', '=', 'departments.departmantid')
+        ->leftjoin('students','results.studentid', '=', 'students.studentid')
+        ->leftjoin('subjectcombinations', 'results.subjectcombinid', '=', 'subjectcombinations.subjectcombinid')
+        ->where('sessionid', $sessions->SessionID)
+        ->where('subjectid', $course)
+        ->orderby('results.matricno')
+        ->get();
+        // return $results;
+        // $theschool = DB::table('faculties')->where('facultyid', $faculty)->first();
+        // $theschool = $theschool->FacultyName;
+        $thesession = $sessions->SessionYear;
+        $subjectlevel = DB::table('subjects')->where('subjectid', $course)->first();
+        // $subjectlevel = $subjectlevel->SubjectLevel;
+
+        $sessions = DB::table('sessions')->get();
+        $faculties = DB::table('faculties')->get();
+        $subject = DB::table('subjects')->orderby('SubjectCode')->get();
+     
+        return view('ems.attendance')->with('faculties', $faculties)->with('subject', $subject)->with('results', $results)->with('thesession', $thesession)->with('subjectlevel', $subjectlevel); 
         
      }
 
