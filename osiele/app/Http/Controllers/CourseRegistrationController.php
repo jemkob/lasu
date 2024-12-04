@@ -49,11 +49,15 @@ class CourseRegistrationController extends Controller
         // Gets the query string from our form submission 
         //$faculty = $request->input('faculties');
         $matricno = $request->input('matricno');
-        $matricno = DB::table('students')->where('matricno', $matricno)->orwhere('jambregno', $matricno)->first();
+        $matricdetails = DB::table('students')->where('matricno', $matricno)->first();
+        $matricno = DB::table('students')->where('matricno', $matricno)->first();
+
+        
         if(!empty($matricno)){
-            $matricno = $matricno->StudentID;
+            $deptid = $matricno->Department;
+            $matricno = $matricno->MatricNo;
         } else{
-            $matricno = $request->input('matricno');
+            return redirect()->back()->with('error', 'Student registration not found!');
         }
         
         // $semester = $request->input('semester');
@@ -62,19 +66,93 @@ class CourseRegistrationController extends Controller
         //$level = $request->input('level');
         $currentsession = DB::table('sessions')->where('currentsession', true)->first();
 
+        // dd($matricno);
+
         $courseview = DB::table('results')
-        ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
         ->leftjoin('students', 'results.matricno', '=', 'students.matricno')
-        ->select( 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'students.major as major', 'students.minor as minor', 'results.resultid as resultid', 'results.matricno as matricno', 'results.studentid as studentid', 'results.ca as ca', 'results.exam as exam', 'results.sessionid as sessionid', 'results.level as resultlevel')
+        ->leftjoin('departments', 'departments.DepartmentID', '=', 'results.DepartmentID')
+        ->leftjoin('allcombinedcourses', 'results.SubjectID', '=', 'allcombinedcourses.courseid')
+        ->select( 'allcombinedcourses.coursetitle as subjectname', 'allcombinedcourses.coursecode as subjectcode', 'allcombinedcourses.courseunit as subjectunit', 'allcombinedcourses.coursestatus as subjectvalue', 'allcombinedcourses.courseid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'results.resultid as resultid', 'results.matricno as matricno', 'results.studentid as studentid', 'results.ca as ca', 'results.exam as exam', 'results.sessionid as sessionid', 'results.level as resultlevel', 'results.departmentid as departmentid')
         ->where('results.matricno', $matricno)
-        ->orwhere('results.studentid', $matricno)
+        // ->orwhere('results.studentid', $matricno)
         ->where('results.sessionid', $currentsession->SessionID)
-        ->orderby('results.semester')
-        ->orderby('subjects.subjectcode')
+        ->where('allcombinedcourses.sessionid', $currentsession->SessionID)
+        ->where('allcombinedcourses.departmentid', $deptid)
+        ->orderby('allcombinedcourses.coursecode')
         // ->where('results.semester', $semester)
         ->get();
+// return $courseview;
 
-        $subjects = DB::table('subjects')->orderby('subjectcode')->get();
+        if(isset($courseview) && count($courseview) < 1){
+
+            return redirect()->back()->with('error', 'No course registration found for the student.');
+        }
+
+
+        $subjects = DB::table('allcombinedcourses')
+        ->where('sessionid', $currentsession->SessionID)
+        ->where('departmentid', $courseview[0]->departmentid)
+        ->orderby('coursecode')
+        ->get();
+
+        //get all data again
+        $sessions = DB::table('sessions')->get();
+        // returns a view and passes the view the list of articles and the original query.
+        return view('courseregistration.index')->with('courseview', $courseview)->with('sessions', $sessions)->with('subjects', $subjects)->with('currentsession', $currentsession);
+        }
+
+        public function searchByAdmissionCode(Request $request)
+        {
+        
+        // Gets the query string from our form submission 
+        //$faculty = $request->input('faculties');
+        $matricno = $request->input('matricno');
+        $matricdetails = DB::table('students')->where('admissioncode', $matricno)->first();
+        $matricno = DB::table('students')->where('admissioncode', $matricno)->first();
+
+       
+        
+        if(!empty($matricno)){ 
+            $deptid = $matricno->Department;
+            $matricno = $matricno->AdmissionCode;
+        } else{
+            return redirect()->back()->with('error', 'Student registration not found!');
+        }
+        
+        // $semester = $request->input('semester');
+        // $sessionid = $request->input('sessions');
+        //$programme = $request->input('programmes');
+        //$level = $request->input('level');
+        $currentsession = DB::table('sessions')->where('currentsession', true)->first();
+
+        // dd($matricno);
+
+        $courseview = DB::table('results')
+        ->leftjoin('students', 'results.matricno', '=', 'students.admissioncode')
+        ->leftjoin('departments', 'departments.DepartmentID', '=', 'results.DepartmentID')
+        ->leftjoin('allcombinedcourses', 'results.SubjectID', '=', 'allcombinedcourses.courseid')
+        ->select( 'allcombinedcourses.coursetitle as subjectname', 'allcombinedcourses.coursecode as subjectcode', 'allcombinedcourses.courseunit as subjectunit', 'allcombinedcourses.coursestatus as subjectvalue', 'allcombinedcourses.courseid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'results.resultid as resultid', 'results.matricno as matricno', 'results.studentid as studentid', 'results.ca as ca', 'results.exam as exam', 'results.sessionid as sessionid', 'results.level as resultlevel', 'results.departmentid as departmentid')
+        ->where('results.matricno', $matricno)
+        // ->orwhere('results.studentid', $matricno)
+        ->where('results.sessionid', $currentsession->SessionID)
+        ->where('allcombinedcourses.sessionid', $currentsession->SessionID)
+        ->where('allcombinedcourses.departmentid', $deptid)
+        ->orderby('allcombinedcourses.coursecode')
+        // ->where('results.semester', $semester)
+        ->get();
+// return $courseview;
+
+        if(isset($courseview) && count($courseview) < 1){
+
+            return redirect()->back()->with('error', 'No course registration found for the student.');
+        }
+
+
+        $subjects = DB::table('allcombinedcourses')
+        ->where('sessionid', $currentsession->SessionID)
+        ->where('departmentid', $courseview[0]->departmentid)
+        ->orderby('coursecode')
+        ->get();
 
         //get all data again
         $sessions = DB::table('sessions')->get();
@@ -88,9 +166,11 @@ class CourseRegistrationController extends Controller
         // Gets the query string from our form submission 
         //$faculty = $request->input('faculties');
         $matricno = $request->input('matricno');
-        $matricno = DB::table('students')->where('matricno', $matricno)->orwhere('jambregno', $matricno)->first();
+        $matricno = DB::table('students')->where('matricno', $matricno)->first();
+        $deptid = $matricno->Department;
+
         if(!empty($matricno)){
-            $matricno = $matricno->StudentID;
+            $matricno = $matricno->MatricNo;
         } else{
             $matricno = $request->input('matricno');
         }
@@ -101,18 +181,23 @@ class CourseRegistrationController extends Controller
         $currentsession = DB::table('sessions')->where('sessionid', $sessionid)->first();
 
         $courseview = DB::table('results')
-        ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
         ->leftjoin('students', 'results.matricno', '=', 'students.matricno')
-        ->select( 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'students.major as major', 'students.minor as minor', 'results.resultid as resultid', 'results.matricno as matricno', 'results.studentid as studentid', 'results.ca as ca', 'results.exam as exam', 'results.sessionid as sessionid', 'results.level as resultlevel')
-        ->where('results.matricno', $matricno) 
-        ->orwhere('results.studentid', $matricno)
-        ->where('results.sessionid', $sessionid)
-        ->orderby('results.semester')
-        ->orderby('subjects.subjectcode')
-        // ->where('results.semester', $semester)
+        ->leftjoin('departments', 'departments.DepartmentID', '=', 'results.DepartmentID')
+        ->leftjoin('allcombinedcourses', 'results.SubjectID', '=', 'allcombinedcourses.courseid')
+        ->select( 'allcombinedcourses.coursetitle as subjectname', 'allcombinedcourses.coursecode as subjectcode', 'allcombinedcourses.courseunit as subjectunit', 'allcombinedcourses.coursestatus as subjectvalue', 'allcombinedcourses.courseid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'results.resultid as resultid', 'results.matricno as matricno', 'results.studentid as studentid', 'results.ca as ca', 'results.exam as exam', 'results.sessionid as sessionid', 'results.level as resultlevel', 'results.departmentid as departmentid')
+        ->where('results.matricno', $matricno)
+        // ->orwhere('results.studentid', $matricno)
+        ->where('results.sessionid', $currentsession->SessionID)
+        ->where('allcombinedcourses.departmentid', $deptid)
+        ->where('allcombinedcourses.sessionid', $currentsession->SessionID)
+        ->orderby('allcombinedcourses.coursecode')
         ->get();
 
-        $subjects = DB::table('subjects')->orderby('subjectcode')->get();
+        $subjects = DB::table('allcombinedcourses')
+        ->where('sessionid', $currentsession->SessionID)
+        ->where('departmentid', $deptid)
+        ->orderby('coursecode')
+        ->get();
 
         //get all data again
         $sessions = DB::table('sessions')->get();
@@ -124,69 +209,44 @@ class CourseRegistrationController extends Controller
         public function addcourse(Request $request){
             $resultid = $request->input('resultid');
             $subject = $request->input('addsubject');
-            $studentid = $request->input('studentid');
             $matric = $request->input('matric');
             $cursession = $request->input('cursession');
             $resultlevel = $request->input('resultlevel');
             $currentsession = DB::table('sessions')->where('currentsession', true)->first();
+            $department = $request->department;
 
-            $getsubject = DB::table('subjects')->where('subjectid', $subject)->first();
+            $getsubject = DB::table('courses')->where('id', $subject)->first();
 
-            $getstudent = DB::table('students')->where('studentid', $studentid)->first();
-            $studentLevel = $getstudent->Level;
-            if(empty($getstudent->Registered)){
-                $studentLevel = $studentLevel - 100;
-            }
-
-            $deptcode = substr($getsubject->SubjectCode, 0, 3);
-            if($deptcode=='BES' || $deptcode =='BEA'){
-                $deptcode = 'BED';
-            }
-            
-
-            $getsubjectdept = DB::table('departments')->where('departmentcode', 'like', '%'.$deptcode.'%')->first();
-
-            if($deptcode == 'ESA'){
-                $getsubjectdept = DB::table('departments')->where('departmentcode', 'DEWS')->first();
-            }
-
-            if($getsubject->SubjectCode == 'EDU 311'){
-                $getsubjectdept = DB::table('departments')->where('departmentcode', 'TP')->first();
-            }
+            $getstudent = DB::table('students')->where('matricno', $matric)->orwhere('AdmissionCode', $matric)->first();
+           
 
             $getdetails = DB::table('results')
             ->where('resultid', $resultid)
             ->first();
 
             $checksubject = DB::table('results')
-            // ->where('matricno', $matric)
-            ->where('studentid', $getstudent->StudentID)
-            // ->where('sessionid', $currentsession->SessionID)
+            ->where('matricno', $matric)
+            // ->where('studentid', $getstudent->StudentID)
             ->where('sessionid', $cursession)
             ->where('subjectid', $subject)
             ->get();
            
             if(count($checksubject) > 0){
-                return redirect('/courseregistration')->with('error', $getsubject->SubjectCode.' already exist in the course form of student with Matric No.: '.$getdetails->MatricNo);
+                return redirect('/courseregistration')->with('error', $getsubject->CourseCode.' already exist in the course form of student with Matric No.: '.$getdetails->MatricNo);
             } else {
             DB::table('results')
             ->insert(
                 ['MatricNo'=>$matric,
+                'StudentID'=>$getstudent->StudentID,
                 'SubjectID'=> $subject,
                 'CA'=>0,
                 'EXAM'=>0,
                 'SessionID'=>$cursession,
-                'StudentID'=>$studentid,
-                'DepartmentID'=>$getsubjectdept->DepartmantID,
-                'SubjectCombinID'=>$getdetails->SubjectCombinID,
+                'DepartmentID'=>$department,
                 'Level'=>$resultlevel,
-                'TNU'=>$getsubject->SubjectValue,
-                'Semester'=>$getsubject->Semester,
-                'CTCP'=>0,
-                'CTNU'=>0,
-                'CTNUP'=>0]);
+                ]);
 
-            return redirect('/courseregistration')->with('success', $getsubject->SubjectCode.' has been added to the course form of student with Matric No.: '.$getdetails->MatricNo);
+            return redirect('/courseregistration')->with('success', $getsubject->CourseCode.' has been added to the course form of student with Matric No.: '.$getdetails->MatricNo);
             }//end else checksubject
         }
 
@@ -202,8 +262,8 @@ class CourseRegistrationController extends Controller
               $iresultid = rtrim($iresultid, ', ');
 
              $getdetails = DB::table('results')
-            ->leftjoin('subjects', 'results.subjectid', '=', 'subjects.subjectid')
-            ->select('subjects.subjectcode as subjectcode', 'results.matricno as matricno')
+            ->leftjoin('courses', 'courses.id', '=', 'results.subjectid')
+            ->select('courses.coursecode as subjectcode', 'results.matricno as matricno')
             // ->where('resultid', $resultid)
             ->whereRaw('resultid in ('.$iresultid.')')
             ->get(); 
@@ -229,6 +289,7 @@ class CourseRegistrationController extends Controller
         //$faculty = $request->input('faculties');
         $matricno = $request->input('matricno');
         $matricno = DB::table('students')->where('matricno', $matricno)->orwhere('jambregno', $matricno)->first();
+        
 
         if(!empty($matricno->MatricNo)){
             $matricno = $matricno->StudentID;
@@ -239,34 +300,123 @@ class CourseRegistrationController extends Controller
         $currentsession = DB::table('sessions')->where('currentsession', true)->first();
         //$programme = $request->input('programmes');
         //$level = $request->input('level');
+        $thestudent=DB::table('students')->where('matricno', $request->matricno)->first();
+        // dd($thestudent);
+        $program = DB::table('subjectcombinations')->where('subjectcombinname', $thestudent->Major.'/'.$thestudent->Minor)->first();
 
+        if($thestudent->Level < 400){
         $courseview = DB::table('results')
-        ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+        ->leftjoin('allcombinedcourses', 'allcombinedcourses.subjectid', '=', 'results.subjectid')
+        // ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
         ->leftjoin('lecturerprofiles', 'results.subjectid', '=', 'lecturerprofiles.subjectid')
         ->leftjoin('lecturers', 'lecturerprofiles.lecturerid', '=', 'lecturers.lecturerid')
         ->leftjoin('students', 'results.matricno', '=', 'students.matricno')
-        ->select( 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'students.major as major', 'students.minor as minor', 'lecturers.surname as lsurname', 'lecturers.firstname as lfirstname')
-        ->where('results.matricno', $matricno)
-        ->orwhere('results.studentid', $matricno)
+        // ->select( 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'students.major as major', 'students.minor as minor', 'lecturers.surname as lsurname', 'lecturers.firstname as lfirstname')
+        ->select( 'allcombinedcourses.subjectname as subjectname', 'allcombinedcourses.subjectcode as subjectcode', 'allcombinedcourses.subjectunit as subjectunit', 'allcombinedcourses.subjectvalue as subjectvalue', 'allcombinedcourses.subjectid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'students.major as major', 'students.minor as minor', 'lecturers.surname as lsurname', 'lecturers.firstname as lfirstname')
+        // ->where('results.matricno', $matricno)
+        ->where('results.studentid', $matricno)
         ->where('results.sessionid', $currentsession->SessionID)
+        ->where('allcombinedcourses.sessionid', $currentsession->SessionID)
+        ->where('allcombinedcourses.subjectcombineid', $program->SubjectCombinID)
         ->where('results.semester', 1)
         ->groupby('results.subjectid')
-        ->orderby('subjects.subjectcode')
-        ->get();
+        // ->orderby('subjects.subjectcode')
+        ->orderby('allcombinedcourses.subjectcode');
 
-        $courseview1 = DB::table('results')
-        ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+        $courseview = DB::table('results')
+        ->leftjoin('allcombinedcourses', 'allcombinedcourses.subjectid', '=', 'results.subjectid')
+        // ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
         ->leftjoin('lecturerprofiles', 'results.subjectid', '=', 'lecturerprofiles.subjectid')
         ->leftjoin('lecturers', 'lecturerprofiles.lecturerid', '=', 'lecturers.lecturerid')
         ->leftjoin('students', 'results.matricno', '=', 'students.matricno')
-        ->select( 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'students.major as major', 'students.minor as minor', 'lecturers.surname as lsurname', 'lecturers.firstname as lfirstname')
-        ->where('results.matricno', $matricno)
-        ->orwhere('results.studentid', $matricno)
+        // ->select( 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'students.major as major', 'students.minor as minor', 'lecturers.surname as lsurname', 'lecturers.firstname as lfirstname')
+        ->select( 'allcombinedcourses.subjectname as subjectname', 'allcombinedcourses.subjectcode as subjectcode', 'allcombinedcourses.subjectunit as subjectunit', 'allcombinedcourses.subjectvalue as subjectvalue', 'allcombinedcourses.subjectid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'students.major as major', 'students.minor as minor', 'lecturers.surname as lsurname', 'lecturers.firstname as lfirstname')
+        // ->where('results.matricno', $matricno)
+        ->where('results.studentid', $matricno)
         ->where('results.sessionid', $currentsession->SessionID)
+        ->where('allcombinedcourses.sessionid', $currentsession->SessionID-1)
+        ->where('allcombinedcourses.subjectcombineid', $program->SubjectCombinID)
+        ->where('results.semester', 1)
+        ->groupby('results.subjectid')
+        // ->orderby('subjects.subjectcode')
+        ->orderby('allcombinedcourses.subjectcode')
+        ->unionall($courseview)
+        ->get();
+
+        $courseview = $courseview->unique('subjectcode')->sortBy('subjectcode');
+
+        $courseview->values()->all();
+
+        $courseview1 = DB::table('results')
+        ->leftjoin('allcombinedcourses', 'allcombinedcourses.subjectid', '=', 'results.subjectid')
+        // ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+        ->leftjoin('lecturerprofiles', 'results.subjectid', '=', 'lecturerprofiles.subjectid')
+        ->leftjoin('lecturers', 'lecturerprofiles.lecturerid', '=', 'lecturers.lecturerid')
+        ->leftjoin('students', 'results.matricno', '=', 'students.matricno')
+        // ->select( 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'students.major as major', 'students.minor as minor', 'lecturers.surname as lsurname', 'lecturers.firstname as lfirstname')
+        ->select( 'allcombinedcourses.subjectname as subjectname', 'allcombinedcourses.subjectcode as subjectcode', 'allcombinedcourses.subjectunit as subjectunit', 'allcombinedcourses.subjectvalue as subjectvalue', 'allcombinedcourses.subjectid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'students.major as major', 'students.minor as minor', 'lecturers.surname as lsurname', 'lecturers.firstname as lfirstname')
+        // ->where('results.matricno', $matricno)
+        ->where('results.studentid', $matricno)
+        ->where('results.sessionid', $currentsession->SessionID)
+        ->where('allcombinedcourses.sessionid', $currentsession->SessionID)
+        ->where('allcombinedcourses.subjectcombineid', $program->SubjectCombinID)
         ->where('results.semester', 2)
         ->groupby('results.subjectid')
-        ->orderby('subjects.subjectcode')
+        // ->orderby('subjects.subjectcode')
+        ->orderby('allcombinedcourses.subjectcode');
+
+        $courseview1 = DB::table('results')
+        ->leftjoin('allcombinedcourses', 'allcombinedcourses.subjectid', '=', 'results.subjectid')
+        // ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+        ->leftjoin('lecturerprofiles', 'results.subjectid', '=', 'lecturerprofiles.subjectid')
+        ->leftjoin('lecturers', 'lecturerprofiles.lecturerid', '=', 'lecturers.lecturerid')
+        ->leftjoin('students', 'results.matricno', '=', 'students.matricno')
+        // ->select( 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'students.major as major', 'students.minor as minor', 'lecturers.surname as lsurname', 'lecturers.firstname as lfirstname')
+        ->select( 'allcombinedcourses.subjectname as subjectname', 'allcombinedcourses.subjectcode as subjectcode', 'allcombinedcourses.subjectunit as subjectunit', 'allcombinedcourses.subjectvalue as subjectvalue', 'allcombinedcourses.subjectid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'students.major as major', 'students.minor as minor', 'lecturers.surname as lsurname', 'lecturers.firstname as lfirstname')
+        // ->where('results.matricno', $matricno)
+        ->where('results.studentid', $matricno)
+        ->where('results.sessionid', $currentsession->SessionID)
+        ->where('allcombinedcourses.sessionid', $currentsession->SessionID-1)
+        ->where('allcombinedcourses.subjectcombineid', $program->SubjectCombinID)
+        ->where('results.semester', 2)
+        ->groupby('results.subjectid')
+        // ->orderby('subjects.subjectcode')
+        ->orderby('allcombinedcourses.subjectcode')
+        ->unionall($courseview1)
         ->get();
+
+        $courseview1 = $courseview1->unique('subjectcode')->sortBy('subjectcode');
+
+        $courseview1->values()->all();
+        } else {
+            $courseview = DB::table('results')
+            ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+            ->leftjoin('lecturerprofiles', 'results.subjectid', '=', 'lecturerprofiles.subjectid')
+            ->leftjoin('lecturers', 'lecturerprofiles.lecturerid', '=', 'lecturers.lecturerid')
+            ->leftjoin('students', 'results.matricno', '=', 'students.matricno')
+            ->select( 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'students.major as major', 'students.minor as minor', 'lecturers.surname as lsurname', 'lecturers.firstname as lfirstname')
+            ->where('results.matricno', $matricno)
+            ->orwhere('results.studentid', $matricno)
+            ->where('results.sessionid', $currentsession->SessionID)
+            ->where('results.semester', 1)
+            ->groupby('results.subjectid')
+            ->orderby('subjects.subjectcode')
+            ->get();
+
+            $courseview1 = DB::table('results')
+            ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+            ->leftjoin('lecturerprofiles', 'results.subjectid', '=', 'lecturerprofiles.subjectid')
+            ->leftjoin('lecturers', 'lecturerprofiles.lecturerid', '=', 'lecturers.lecturerid')
+            ->leftjoin('students', 'results.matricno', '=', 'students.matricno')
+            ->select( 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'students.major as major', 'students.minor as minor', 'lecturers.surname as lsurname', 'lecturers.firstname as lfirstname')
+            ->where('results.matricno', $matricno)
+            ->orwhere('results.studentid', $matricno)
+            ->where('results.sessionid', $currentsession->SessionID)
+            ->where('results.semester', 2)
+            ->groupby('results.subjectid')
+            ->orderby('subjects.subjectcode')
+            ->get();
+        }
 
 
         $students = DB::table('students')->where('matricno', $matricno)->orwhere('studentid', $matricno)->first();

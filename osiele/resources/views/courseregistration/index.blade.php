@@ -21,6 +21,21 @@
                 </div>
           </form>
         </div>
+
+        <div class="col-sm-4">
+          <form action="{{url('courseregistration/searchadmissioncode')}}" method="post">
+            
+            {{csrf_field()}}
+                    <div class="form-group">
+                        <label for="">Admission Code</label>
+                        <input type="text" placeholder="e.g. LASUABK1234568"  class="form-control" name="matricno" id="matricno">
+                    </div>
+                  
+                  <div class="col-md-6">
+                    <button class="btn btn-primary" type="submit">Show Registered Courses</button>
+                </div>
+          </form>
+        </div>
       </div>
                   <p></p> <p></p>       
         
@@ -33,7 +48,7 @@
 
 
     <table class="table table-striped" style="text-transform:uppercase;" width="70%">
-    <tr><td class="alert alert-success"><h3>{{$courseview[0]->surname.' '.$courseview[0]->firstname.' '.$courseview[0]->middlename}} ({{$courseview[0]->major.'/'.$courseview[0]->minor}}) {{$courseview[0]->matricno}} [{{$currentsession->SessionYear}}]</h3></td></tr>
+    <tr><td class="alert alert-success"><h3>{{$courseview[0]->surname.' '.$courseview[0]->firstname.' '.$courseview[0]->middlename}}  {{$courseview[0]->matricno}} [{{$currentsession->SessionYear}}]</h3></td></tr>
     </table>
     <form name="form1" method="post" action="{{url('courseregistration/deletecourse')}}">
                       {{csrf_field()}}
@@ -97,14 +112,15 @@
                       <select class="form-control" name="addsubject" id="addsubject">
                           <option value="0" disable="true" selected="true">-- Select Course To Add --</option>
                             @foreach ($subjects as $key => $value)
-                              <option value="{{$value->SubjectID}}">{{ $value->SubjectCode.' -  '.$value->SubjectName }}</option>
+                              <option value="{{$value->CourseID}}">{{ $value->CourseCode.' -  '.$value->CourseTitle }}</option>
                             @endforeach
                         </select>
                         <input type="hidden" name="details" id="details" value="{{$courseview[0]->resultid}}">
                         <input type="hidden" name="matric" id="matric" value="{{$courseview[0]->matricno}}">
-                        <input type="hidden" name="studentid" id="studentid" value="{{$courseview[0]->studentid}}">
+                        {{-- <input type="hidden" name="studentid" id="studentid" value="{{$courseview[0]->studentid}}"> --}}
                         <input type="hidden" name="resultid" id="resultid" value="{{$courseview[0]->resultid}}">
                         <input type="hidden" name="cursession" id="cursession" value="{{$courseview[0]->sessionid}}">
+                        <input type="hidden" name="department" id="department" value="{{$courseview[0]->departmentid}}">
                         <input type="hidden" name="resultlevel" id="resultlevel" value="{{$courseview[0]->resultlevel}}">
                       </td>
                         <td><input class="btn btn-warning" type="submit" name="subjectbutton" id="subjectbutton" value="Add To Course Form" onclick="return confirm('Are you sure you want to add a course for {{$courseview[0]->matricno}}? You cannot undo this action');">

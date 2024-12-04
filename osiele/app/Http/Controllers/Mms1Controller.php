@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Student;
 use PDF;
+use Auth;
 
 class Mms1Controller extends Controller
 {
@@ -34,106 +35,80 @@ class Mms1Controller extends Controller
         return view('mms1.index')->with('faculties', $faculties)->with('sessions', $sessions);
      }
 
+     public function indexGraduating()
+    {
+        $faculties = DB::table('faculties')->get();
+        //$users = DB::table('users')->skip(10)->take(5)->get();
+        // $getdeptid = DB::table('results')->select('DepartmentID')->groupBy('DepartmentID')
+        // ->where('SubjectCombinID', 71)->skip(0)->take(4)->get();
+        //SELECT DISTINCT(DepartmentID) FROM `results` where SubjectCombinID = 71
+        
+        //return $getdeptid;
+        // $departments = DB::table('departments')->get();
+        // $sessions = DB::table('sessions')->get();
+        // $programmes = DB::table('subjectcombinations')->get();
+       
+        
+        $sessions = DB::table('sessions')->get();
+        //$programmes = DB::table('subjectcombinations')->get();
+          
+        return view('mms1.graduating')->with('faculties', $faculties)->with('sessions', $sessions);
+     }
+
+     public function index300plus()
+    {
+        $faculties = DB::table('faculties')->get();
+        
+        $sessions = DB::table('sessions')->get();
+        //$programmes = DB::table('subjectcombinations')->get(
+          
+        return view('mms1.index300plus')->with('faculties', $faculties)->with('sessions', $sessions);
+     }
+
      public function search(Request $request)
      {
         
         // Gets the query string from our form submission 
         $faculty = $request->input('faculties');
         $department = $request->input('departments');
-        $semester = $request->input('semester');
         $thesession = $request->input('sessions');
-        $programme = $request->input('programmes');
         $level = $request->input('level');
-        $bedas = $request->input('bedasi');
         
-
-        $subcom = DB::table('subjectcombinations')->where('subjectcombinid', $programme)->first();
-        
-        // $majorminor = str_ireplace("/",", ",$subcom->SubjectCombinName);
-       
-        $major = substr($subcom->SubjectCombinName, 0,3);
-        $minor = stristr($subcom->SubjectCombinName,"/");
-        $minor = substr($minor, 1,3);
-        // return $minor;
-        if($minor =='GBO'){
-            $minor = 'IGB';
-        }
-        if($major =='GBO'){
-            $major = 'IGB';
-        }
-
-        if($level == 300){
-            $majorminmax = DB::table('minmax')->where('code', $major)->where('level', 300)->where('Semester', $semester)->first();
-            $minorminmax = DB::table('minmax')->where('code', $minor)->where('level', 300)->where('Semester', $semester)->first();
-        }elseif($level > 300){
-            $majorminmax = DB::table('minmax')->where('code', $major)->where('level', 300)->where('Semester', 2)->first();
-            $minorminmax = DB::table('minmax')->where('code', $minor)->where('level', 300)->where('Semester', 2)->first();
-        } else {
-        $majorminmax = DB::table('minmax')->where('code', $major)->where('level', $level)->where('Semester', $semester)->first();
-        $minorminmax = DB::table('minmax')->where('code', $minor)->where('level', $level)->where('Semester', $semester)->first();
-        }
-
-        if($level > 200){
-        $tpminmax = DB::table('minmax')->where('code', 'TP')->first();
-        view()->share('tpminmax', $tpminmax);
-        }
-
-        // return $majorminmax;
-        view()->share('majorminmax', $majorminmax);
-        view()->share('minorminmax', $minorminmax);
 
         
 
-        $semester01 = $semester;
         $session01 = $thesession;
         $level01 = $level;
         $dept01 = '';
 
-        if(($level=='100') && ($semester =='1')){
+        $results = DB::table('results')
+        ->leftjoin('departments', 'results.DepartmentID', '=', 'departments.DepartmentID')
+        ->leftjoin('allcombinedcourses', 'results.SubjectID', '=', 'allcombinedcourses.courseid')
+        ->leftjoin('students', 'results.matricno', '=', 'students.matricno')         
+        ->groupBy('results.MatricNo')
+        ->selectRaw('results.matricno as matricno, students.surname as surname, students.firstname as firstname, students.middlename as middlename, students.levelofentry as entrylevel')
+        ->where('results.Level', $level01)
+        ->where('results.SessionID', $session01)
+        ->where('results.departmentid', $department)
+        ->get();
+
+
+        if($level=='100'){
             include('100-1.php');
-        } elseif(($level=='100') && ($semester =='2')){
-            include('100-2.php');
-        } elseif(($level=='200') && ($semester =='1')){
+        } elseif($level=='200'){
             include('200-1.php');
-        } elseif(($level=='200') && ($semester =='2')){
-            include('200-2.php');
-        } elseif(($level=='300') && ($semester =='1')){
+           
+        } elseif($level=='300'){
             include('300-1.php');
-            view()->share('results5', $results5);
-            if(isset($bedas) && !empty($bedas)){
-                view()->share('bedas', $bedas);
-            }
-        } elseif(($level=='300') && ($semester =='2')){
-            include('300-2.php');
-            view()->share('results5', $results5);
-            if(isset($bedas) && !empty($bedas)){
-                view()->share('bedas', $bedas);
-            }
-        } elseif(($level=='400') && ($semester =='1')){
+        }  elseif(($level=='400')){
             include('400-1.php');
-            view()->share('results5', $results5);
-            if(isset($bedas) && !empty($bedas)){
-                view()->share('bedas', $bedas);
-            }
-        } elseif(($level=='400') && ($semester =='2')){
-            include('400-2.php');
-            view()->share('results5', $results5);
-            if(isset($bedas) && !empty($bedas)){
-                view()->share('bedas', $bedas);
-            }
-        } elseif(($level=='500') && ($semester =='1')){
+        }elseif(($level=='500')){
             include('500-1.php');
-            view()->share('results5', $results5);
-            if(isset($bedas) && !empty($bedas)){
-                view()->share('bedas', $bedas);
-            }
-        } elseif(($level=='500') && ($semester =='2')){
-            include('500-2.php');
-            view()->share('results5', $results5);
-            if(isset($bedas) && !empty($bedas)){
-                view()->share('bedas', $bedas);
-            }
         }
+
+        
+        
+        // return $resultaddup->where('matricno', '17ABK01301005');
         // return $results1;
         // echo $subcom;
         // return $getdeptid;
@@ -142,31 +117,106 @@ class Mms1Controller extends Controller
         // dd($getdeptcode1);
         // return $getid.' === '.$deptcode2.' === '.$deptcode3.' === '.$deptcode4.' === '.$deptcode1;
         // return $resultaddup;
+        // return $compulsorycourses;
+        $sessions = DB::table('sessions')->get();
+        $faculties = DB::table('faculties')->get();
 
-
-        $theprogramme = DB::table('subjectcombinations')->where('SubjectCombinID', $programme)->first();
-        $theschool = DB::table('faculties')->where('FacultyID', $faculty)->first();
-        $thisession = DB::table('sessions')->where('SessionID', $session01)->first();
+        $departmentname = DB::table('departments')->where('departmentid', $department)->first();
+        
+               
+       $theschool = DB::table('faculties')->where('FacultyID', $faculty)->first();
+       $thisession = DB::table('sessions')->where('SessionID', $session01)->first();
  
      view()->share('level', $level);
-     view()->share('semester', $semester);
      view()->share('session01', $session01);
-     view()->share('theprogramme', $theprogramme);
      view()->share('theschool', $theschool);
      view()->share('thisession', $thisession);
      
      //share data for print page
      view()->share('department', $department);
      view()->share('faculty', $faculty);
-     view()->share('programme', $programme);
-       
+     view()->share('departmentname', $departmentname);       
 
      
 
     /* $pdf = PDF::loadView('mms1.index', compact('results', 'sessions', 'results1', 'results2', 'results3', 'results4', 'resultaddup', 'resultaddup2', 'faculties', 'deptcode1', 'deptcode2','deptcode3', 'deptcode4', 'deptid1', 'deptid2', 'deptid3', 'deptid4', 'compulsorycourses'));
     return $pdf->download('results.pdf');
  */
-        return view('mms1.index')->with('results', $results)->with('results1', $results1)->with('results2', $results2)->with('results3', $results3)->with('results4', $results4)->with('resultaddup', $resultaddup)->with('resultaddup2', $resultaddup2)->with('faculties', $faculties)->with('sessions', $sessions)->with('deptcode1', $deptcode1)->with('deptcode2', $deptcode2)->with('deptcode3', $deptcode3)->with('deptcode4', $deptcode4)->with('deptid1', $deptid1)->with('deptid2', $deptid2)->with('deptid3', $deptid3)->with('deptid4', $deptid4)->with('compulsorycourses', $compulsorycourses);
+        return view('mms1.index')->with('results', $results)->with('results1', $results1)->with('resultaddup', $resultaddup)->with('faculties', $faculties)->with('sessions', $sessions)->with('compulsorycourses', $compulsorycourses);
+        
+     }
+
+     public function searchGraduating(Request $request)
+     {
+        
+        // Gets the query string from our form submission 
+        $faculty = $request->input('faculties');
+        $department = $request->input('departments');
+        $thesession = $request->input('sessions');
+        $level = $request->input('level');
+        
+
+        
+
+        $session01 = $thesession;
+        $level01 = $level;
+        $dept01 = '';
+
+        $results = DB::table('results')
+        ->leftjoin('departments', 'results.DepartmentID', '=', 'departments.DepartmentID')
+        ->leftjoin('allcombinedcourses', 'allcombinedcourses.courseid', '=', 'results.SubjectID')
+        ->leftjoin('students', 'results.matricno', '=', 'students.matricno')         
+        ->groupBy('results.MatricNo')
+        ->selectRaw('results.matricno as matricno, students.surname as surname, students.firstname as firstname, students.middlename as middlename, students.levelofentry as entrylevel')
+        ->where('results.Level', $level01)
+        ->where('results.SessionID', $session01)
+        ->where('results.departmentid', $department)
+        ->get();
+
+
+        if($level=='100'){
+            include('100-1.php');
+        } elseif($level=='200'){
+            include('200-1.php');
+           
+        } elseif($level=='300'){
+            include('300-1.php');
+        }  elseif(($level=='400')){
+            include('400-1.php');
+        }elseif(($level=='500')){
+            include('500-1.php');
+        }
+        
+        // return $results;
+        // return $results1;
+        // echo $subcom;
+        // return $getdeptid;
+        // return $results1.' sdfdf  '. $results2;
+        // return $deptcode1;
+        // dd($getdeptcode1);
+        // return $getid.' === '.$deptcode2.' === '.$deptcode3.' === '.$deptcode4.' === '.$deptcode1;
+        // return $resultaddup;
+        // return $compulsorycourses;
+        $sessions = DB::table('sessions')->get();
+        $faculties = DB::table('faculties')->get();
+
+        $departmentname = DB::table('departments')->where('departmentid', $department)->first();
+        
+               
+       $theschool = DB::table('faculties')->where('FacultyID', $faculty)->first();
+       $thisession = DB::table('sessions')->where('SessionID', $session01)->first();
+ 
+     view()->share('level', $level);
+     view()->share('session01', $session01);
+     view()->share('theschool', $theschool);
+     view()->share('thisession', $thisession);
+     
+     //share data for print page
+     view()->share('department', $department);
+     view()->share('faculty', $faculty);
+     view()->share('departmentname', $departmentname);       
+
+        return view('mms1.graduating')->with('results', $results)->with('results1', $results1)->with('resultaddup', $resultaddup)->with('faculties', $faculties)->with('sessions', $sessions)->with('compulsorycourses', $compulsorycourses);
         
      }
 

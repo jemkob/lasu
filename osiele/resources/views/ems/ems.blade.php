@@ -77,7 +77,7 @@ overflow: visible !important;
                                         <select class="form-control" name="course" id="course">
                                           <option value="0" disable="true" selected="true">--- Select Course ---</option>
                                           @foreach ($subject as $key => $value)
-                                              <option value="{{$value->SubjectID}}">{{ $value->SubjectCode }}</option>
+                                              <option value="{{$value->Id}}">{{ $value->CourseCode.' - '.$value->CourseTitle }}</option>
                                             @endforeach
                                         </select>
                                       </div>
@@ -116,12 +116,14 @@ overflow: visible !important;
                                
                                  <table width="100%" border="0">
                                      <tr>
-                                       <th scope="col" rowspan="5"><img src="../images/logo.png" /></th>
-                                       <td align="center" scope="col"><h3><strong>FEDERAL COLLEGE OF EDUCATION ABEOKUTA</strong></h3></td>
+                                       <th scope="col" rowspan="5"><img src="../images/logo.png" width="100" /></th>
+                                       <td align="center" scope="col"><h2><strong>LAGOS STATE UNIVERSITY, OJO, ABEOKUTA CAMPUS</strong></h2>
+                        <h3>SANDWICH DEGREE PROGRAMME</h3>
+                      </td>
                                        <th scope="col">&nbsp;</th>
                                      </tr>
                                      <tr>
-                                       <td align="center"><h5><STRong><u> NCE EXAM MARK SHEET</u></STRong></h5></td>
+                                       <td align="center"><h5><STRong><u> EXAM MARK SHEET</u></STRong></h5></td>
                                        <th>&nbsp;</th>
                                        <td>&nbsp;</td>
                                      </tr>
@@ -134,11 +136,10 @@ overflow: visible !important;
                                        <td align='center' style="font-size: 11px;"><table width="100%" border="0" cellpadding="1" cellspacing="1">
                                         <tr>
                                           <td style="font-size: 11px;">
-                                          <strong>SCHOOL:</strong>&nbsp;{{$theschool}}&emsp;
-                                          <strong>SEMESTER:</strong>
-                                          &nbsp;@if($results[0]->Semester == 1) 1ST @else 2ND @endif <strong> &emsp; SESSION:</strong>{{$thesession}}<br>
-                                          <strong>COURSE TITLE:</strong>&nbsp;{{$subjectlevel->SubjectName}} &emsp;<strong>COURSE CODE:</strong>&nbsp;{{$subjectlevel->SubjectCode}} &emsp;<strong>UNIT:</strong>&nbsp;{{$subjectlevel->SubjectValue}} &emsp;
-                                          <strong>STATUS:</strong>&nbsp;{{$subjectlevel->SubjectUnit}} 
+                                          <strong>FACULTY:</strong>&nbsp;{{$theschool}}&emsp;
+                                          <strong> &emsp; SESSION:</strong>{{$thesession}}<br>
+                                          <strong>COURSE TITLE:</strong>&nbsp;{{$subjectlevel->CourseTitle}} &emsp;<strong>COURSE CODE:</strong>&nbsp;{{$subjectlevel->CourseCode}} &emsp;<strong>UNIT:</strong>&nbsp;{{$subjectlevel->CourseUnit}} &emsp;
+                                          <strong>STATUS:</strong>&nbsp;{{$subjectlevel->CourseStatus}} 
                                           </td>
                                           </tr>
                                        </table></td>
@@ -156,11 +157,11 @@ overflow: visible !important;
                            <tr>
                              <th width="6%" scope="col">S/N</th>
                              <th width="10%" scope="col">Matric</th>
-                             <th width="15%" scope="col">SubComb</th>
-                             <th scope="col" colspan="4" nowrap>&nbsp;&nbsp;&nbsp;&nbsp;CA SCORE&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                             <th width="4%" scope="col">TOTAL C.A. (40%)</th>
+                             <th width="15%" scope="col">Department</th>
+                             <th scope="col" colspan="3" nowrap>&nbsp;&nbsp;&nbsp;&nbsp;CA SCORE&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                             <th width="4%" scope="col">TOTAL C.A. (30%)</th>
                              <th scope="col" colspan="6" nowrap>EXAMINATION SCORE</th>
-                             <th scope="col">TOTAL EXAM (60%)</th>
+                             <th scope="col">TOTAL EXAM (70%)</th>
                              <th scope="col">TOTAL CA & EXAM (100%)</th>
                              <th scope="col">H.O.D EXTERNAL MODERATOR'S REMARK</th>
                          
@@ -173,7 +174,6 @@ overflow: visible !important;
                              <td align="center">1</td>
                              <td align="center">2</td>
                              <td align="center">3</td>
-                             <td align="center">4</td>
                              <td></td>
                              <td align="center">1</td>
                              <td align="center">2</td>
@@ -190,10 +190,9 @@ overflow: visible !important;
                            @foreach($results as $index=>$result)
                            <tr>
                              <td>{{$index+1}}</td>
-                             <td>{{$result->MatricNo}}</td>
-                             <td>{{$result->SubjectCombinName}}</td>
+                             <td>@if(empty($result->MatricNo)){{$result->AdmissionCode}}@else {{$result->MatricNo}}@endif</td>
+                             <td>{{$result->DepartmentName}}</td>
                              <td style="padding-top:7px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&emsp;</td>
-                             <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&emsp;&emsp;</td>
                              <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&emsp;&emsp;</td>
                              <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&emsp;&emsp;</td>
                              <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
@@ -211,12 +210,12 @@ overflow: visible !important;
                          </tbody>
                          <tfoot>
                              <tr>
-                               <td colspan="17">
+                               <td colspan="16">
                                  <div class="col-12">
                                    <br><br>
                           NAME OF EXAMINER____________________ SIGNATURE___________ DATE______________<br />
                           <br><br>
-                          NAME OF HEAD OF DEPARTMENT____________________ SIGNATURE_____________ DATE__________<br />
+                          COORDINATOR's NAME : <u> DR. EMILY O. ADENIJI</u> SIGNATURE_____________ DATE__________<br />
                           <br><br>
                           MODERATOR'S NAME________________________ SIGNATURE_____________ DATE___________<br /></div>
                              <table align="center" style="padding-top:30px;">

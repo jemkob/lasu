@@ -31,8 +31,10 @@ class ResultuploadController extends Controller
         $lecturer = Auth::user()->LecturerID;
         $faculties = DB::table('faculties')->get();
         $subjects = DB::table('lecturerprofiles')
-            ->join('subjects', 'lecturerprofiles.SubjectID', '=', 'subjects.SubjectID')
-            ->select('subjects.SubjectID as subjectid', 'subjects.SubjectCode as subjectcode')
+            ->join('courses', 'lecturerprofiles.SubjectID', '=', 'courses.Id')
+            // ->join('courses', 'lecturerprofiles.SubjectID', '=', 'courses.Id')
+            ->select('courses.id as subjectid', 'courses.coursecode as subjectcode')
+            // ->select('courses.id as subjectid', 'courses.coursecode as subjectcode')
             ->where('lecturerprofiles.LecturerID', $lecturer)
             ->get();
         return view('lecturer.download')->with('subjects', $subjects)->with('faculties', $faculties)->with('activityschedule', $activityschedule);
@@ -48,8 +50,8 @@ class ResultuploadController extends Controller
 
         $lecturer = Auth::user()->LecturerID;
         $subjects = DB::table('lecturerprofiles')
-            ->join('subjects', 'lecturerprofiles.SubjectID', '=', 'subjects.SubjectID')
-            ->select('subjects.SubjectID as subjectid', 'subjects.SubjectCode as subjectcode')
+            ->join('courses', 'lecturerprofiles.SubjectID', '=', 'courses.Id')
+            ->select('courses.id as subjectid', 'courses.coursecode as subjectcode')
             ->where('lecturerprofiles.LecturerID', $lecturer)
             ->get();
         return view('lecturer.score')->with('subjects', $subjects)->with('activityschedule', $activityschedule);
@@ -64,12 +66,13 @@ class ResultuploadController extends Controller
 
         $lecturer = Auth::user()->LecturerID;
         $faculties = DB::table('faculties')->get();
+        $departments = DB::table('departments')->get();
         $subjects = DB::table('lecturerprofiles')
-            ->join('subjects', 'lecturerprofiles.SubjectID', '=', 'subjects.SubjectID')
-            ->select('subjects.SubjectID as subjectid', 'subjects.SubjectCode as subjectcode')
+            ->join('courses', 'lecturerprofiles.SubjectID', '=', 'courses.Id')
+            ->select('courses.id as subjectid', 'courses.coursecode as subjectcode')
             ->where('lecturerprofiles.LecturerID', $lecturer)
             ->get();
-        return view('lecturer.downloadbydept')->with('subjects', $subjects)->with('faculties', $faculties)->with('activityschedule', $activityschedule);
+        return view('lecturer.downloadbydept')->with('subjects', $subjects)->with('faculties', $faculties)->with('activityschedule', $activityschedule)->with('departments', $departments);
     }
     public function downloadpdfindex()
     {
@@ -77,8 +80,8 @@ class ResultuploadController extends Controller
         $lecturer = Auth::user()->LecturerID;
         $faculties = DB::table('faculties')->get();
         $subjects = DB::table('lecturerprofiles')
-            ->join('subjects', 'lecturerprofiles.SubjectID', '=', 'subjects.SubjectID')
-            ->select('subjects.SubjectID as subjectid', 'subjects.SubjectCode as subjectcode')
+            ->join('courses', 'lecturerprofiles.SubjectID', '=', 'courses.Id')
+            ->select('courses.id as subjectid', 'courses.coursecode as subjectcode')
             ->where('lecturerprofiles.LecturerID', $lecturer)
             ->get();
         return view('lecturer.downloadresult')->with('subjects', $subjects)->with('faculties', $faculties);
@@ -94,8 +97,8 @@ class ResultuploadController extends Controller
 
         $lecturer = Auth::user()->LecturerID;
         $subjects = DB::table('lecturerprofiles')
-            ->join('subjects', 'lecturerprofiles.SubjectID', '=', 'subjects.SubjectID')
-            ->select('subjects.SubjectID as subjectid', 'subjects.SubjectCode as subjectcode')
+            ->join('courses', 'lecturerprofiles.SubjectID', '=', 'courses.Id')
+            ->select('courses.id as subjectid', 'courses.coursecode as subjectcode')
             ->where('lecturerprofiles.LecturerID', $lecturer)
             ->get();
         return view('lecturer.index')->with('subjects', $subjects)->with('activityschedule', $activityschedule);
@@ -106,8 +109,8 @@ class ResultuploadController extends Controller
         //
         $lecturer = Auth::user()->LecturerID;
         $subjects = DB::table('lecturerprofiles')
-            ->join('subjects', 'lecturerprofiles.SubjectID', '=', 'subjects.SubjectID')
-            ->select('subjects.SubjectID as subjectid', 'subjects.SubjectCode as subjectcode')
+            ->join('courses', 'lecturerprofiles.SubjectID', '=', 'courses.Id')
+            ->select('courses.id as subjectid', 'courses.coursecode as subjectcode')
             ->where('lecturerprofiles.LecturerID', $lecturer)
             ->get();
         return view('lecturer.studentlist')->with('subjects', $subjects);
@@ -117,8 +120,8 @@ class ResultuploadController extends Controller
         //
         $lecturer = Auth::user()->LecturerID;
         $subjects = DB::table('lecturerprofiles')
-            ->join('subjects', 'lecturerprofiles.SubjectID', '=', 'subjects.SubjectID')
-            ->select('subjects.SubjectID as subjectid', 'subjects.SubjectCode as subjectcode')
+            ->join('courses', 'lecturerprofiles.SubjectID', '=', 'courses.Id')
+            ->select('courses.id as subjectid', 'courses.coursecode as subjectcode')
             ->where('lecturerprofiles.LecturerID', $lecturer)
             ->get();
         return view('lecturer.studentlist')->with('subjects', $subjects);
@@ -129,8 +132,8 @@ class ResultuploadController extends Controller
         //student list
         $lecturer = Auth::user()->LecturerID;
         $subjects = DB::table('lecturerprofiles')
-            ->join('subjects', 'lecturerprofiles.SubjectID', '=', 'subjects.SubjectID')
-            ->select('subjects.SubjectID as subjectid', 'subjects.SubjectCode as subjectcode')
+            ->join('courses', 'lecturerprofiles.SubjectID', '=', 'courses.Id')
+            ->select('courses.id as subjectid', 'courses.coursecode as subjectcode')
             ->where('lecturerprofiles.LecturerID', $lecturer)
             ->get();
        // return view('lecturer.studentlist')->with('subjects', $subjects);
@@ -168,8 +171,8 @@ class ResultuploadController extends Controller
         //student list
         $lecturer = Auth::user()->LecturerID;
         $subjects = DB::table('lecturerprofiles')
-            ->join('subjects', 'lecturerprofiles.SubjectID', '=', 'subjects.SubjectID')
-            ->select('subjects.SubjectID as subjectid', 'subjects.SubjectCode as subjectcode')
+            ->join('courses', 'lecturerprofiles.SubjectID', '=', 'courses.Id')
+            ->select('courses.id as subjectid', 'courses.coursecode as subjectcode')
             ->where('lecturerprofiles.LecturerID', $lecturer)
             ->get();
        // return view('lecturer.studentlist')->with('subjects', $subjects);
@@ -235,19 +238,19 @@ class ResultuploadController extends Controller
         //file name and time
         $filetostore = $filename.'_'.date("Y-m-d-h-i-sa", time()).'.'.$thefileExt;
 
-        $getcourse = DB::table('subjects')->where('subjectid', $subjectupload)->first();
+        $getcourse = DB::table('courses')->where('id', $subjectupload)->first();
         // if(strlen($getcourse->SubjectCode) > 7){
         //     $coursefilename = substr($thefile, 0, 10);
         // } else {
         //     $coursefilename = substr($thefile, 0, 7);
         // }
-        $coursestrlen = strlen($getcourse->SubjectCode);
+        $coursestrlen = strlen($getcourse->CourseCode);
         $coursefilename = substr($thefile, 0, $coursestrlen);
         // $getcourse = DB::table('subjects')->where('subjectid', $subjectupload)->first();
 
-        if(trim($coursefilename) !== ($getcourse->SubjectCode)) {
+        if(trim($coursefilename) !== ($getcourse->CourseCode)) {
 
-            return redirect('lecturer/resultupload')->with('error', 'Sorry the file selected does not match the course selected. You selected "'.$thefile.'" for '.$getcourse->SubjectCode.'.  Kindly follow this order, if course name is e.g. CHE 112, then the file name must begin with CHE 112.');
+            return redirect('lecturer/resultupload')->with('error', 'Sorry the file selected does not match the course selected. You selected "'.$thefile.'" for '.$getcourse->CourseCode.'.  Kindly follow this order, if course name is e.g. CHE 112, then the file name must begin with CHE 112.');
         }
 
         //create temporary table
@@ -280,6 +283,12 @@ class ResultuploadController extends Controller
                     $lecturerid = Auth::user()->LecturerID;
                     $csvca = $csvLine->get('ca');//ca
                     $csvexam = $csvLine->get('exam');//exam
+                    if($csvca > 30){
+                        return redirect('lecturer/resultupload')->with('error', 'Sorry, CA cannot be more than 30.');
+                    }
+                    if($csvca > 0 && $csvexam > 70){
+                        return redirect('lecturer/resultupload')->with('error', 'Sorry, Exam score cannot be more than 70.');
+                    }
                     if($csvca == '' || $csvca == NULL){
                         $csvca = 0;
                     }
@@ -347,8 +356,8 @@ class ResultuploadController extends Controller
         $subject = $request->input('subject');
         //$session = $request->input('session');
         $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
-        $subjectcode = DB::table('subjects')->where('SubjectID', $subject)->first();
-        $subjectcodename = $subjectcode->SubjectCode;
+        $subjectcode = DB::table('courses')->where('Id', $subject)->first();
+        $subjectcodename = $subjectcode->CourseCode;
         $thesession = $sessions->SessionYear;
         //$subject = $request->input('subject');
                 $prevdownload = DB::table('results')
@@ -439,8 +448,8 @@ class ResultuploadController extends Controller
 
                $lecturer = Auth::user()->LecturerID;
             $subjects = DB::table('lecturerprofiles')
-            ->join('subjects', 'lecturerprofiles.SubjectID', '=', 'subjects.SubjectID')
-            ->select('subjects.SubjectID as subjectid', 'subjects.SubjectCode as subjectcode')
+            ->join('courses', 'lecturerprofiles.SubjectID', '=', 'courses.Id')
+            ->select('courses.id as subjectid', 'courses.coursecode as subjectcode')
             ->where('lecturerprofiles.LecturerID', $lecturer)
             ->get();
         return view('lecturer.index')->with('subjects', $subjects)->with('asubject', $asubject)->with('success', 'Result Uploaded Successfully! '.$asubject);
@@ -454,12 +463,12 @@ class ResultuploadController extends Controller
         //$items = Item::all();
         $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
         $thesubject = $request->input('subject');
-        $thefaculty = $request->input('faculty');
-        $getCourseCode= DB::table('subjects')->where('subjectid', $thesubject)->first();
-        $CourseCode = $getCourseCode->SubjectCode;
+        // $thefaculty = $request->input('faculty');
+        $getCourseCode= DB::table('courses')->where('id', $thesubject)->first();
+        $CourseCode = $getCourseCode->CourseCode;
         
         $results = DB::table('results')
-        ->leftjoin('departments', 'results.departmentid', '=', 'departments.DepartmantID')
+        // ->leftjoin('departments', 'results.departmentid', '=', 'departments.DepartmantID')
         // ->select('matricno', 'ca', 'exam', 'resultid')
         ->select('matricno', 'ca', 'exam', 'resultid')
         //->where('matricno', '!=', null)
@@ -495,41 +504,19 @@ class ResultuploadController extends Controller
         $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
         $thesubject = $request->input('subject');
         $thefaculty = $request->input('faculty');
-        $getCourseCode= DB::table('subjects')->where('subjectid', $thesubject)->first();
-        $faculty = DB::table('faculties')->where('facultyid', $thefaculty)->first();
-        $CourseCode = $getCourseCode->SubjectCode.'-'.$faculty->FacultyName;
+        $department = $request->department;
+        $getCourseCode= DB::table('courses')->where('id', $thesubject)->first();
+        $dept = DB::table('departments')->where('departmentid', $department)->first();
+        $CourseCode = $getCourseCode->CourseCode.'-'.$dept->DepartmentName;
 
-        $studentcomb = DB::table('students')->select('Major', 'Minor')->where('FacultyName', $faculty->FacultyName)->where('major', '!=',null)->where('minor', '!=',null)->where('major', '!=', '')->where('minor', '!=', '')->groupby('Major', 'Minor')->get();
-
-        $CourseDept = DB::table('departments')->select('departmantid')->where('Facultyid', $thefaculty)->get();
-
-        $ideptcode = "";
-        foreach($studentcomb as $cdept){
-            $ideptcode .= "'".$cdept->Major.'/'.$cdept->Minor."'".', ';
-        }
-
-        $thedept = rtrim($ideptcode, ', ');
-
-
-        $subjectcombine = DB::table('subjectcombinations')->select('subjectcombinid')
-        ->whereRaw('subjectcombinname in ('.$thedept.')')
-        ->get();
-
-        $isubcomb = "";
-        foreach($subjectcombine as $subcom){
-            $isubcomb .= $subcom->subjectcombinid.', ';
-        }
-
-        $thesubcomb = rtrim($isubcomb, ', ');
-
-        // return $thesubcomb;
+        
         $results = DB::table('results')
         // ->select('matricno', 'ca', 'exam', 'resultid')
         ->select('matricno', 'ca', 'exam', 'resultid')
         //->where('matricno', '!=', null)
         ->where('subjectid', $thesubject)
         ->where('sessionid', $sessions->SessionID)
-        ->whereRaw('subjectcombinid in ('.$thesubcomb.')')
+        ->where('departmentid', $dept->DepartmentID)
         ->where('EXAM', 0)
         ->where('CA', 0)
         ->orderby('matricno')
@@ -558,7 +545,7 @@ class ResultuploadController extends Controller
 
         return view('lecturer.download')->with('download', $download);
     } else {
-        return redirect('lecturer/downloademsdept')->with('error', 'No student in this school offering '.$getCourseCode->SubjectCode);
+        return redirect('lecturer/downloademsdept')->with('error', 'No student in this school offering '.$getCourseCode->CourseCode);
     }
   
       }
@@ -570,50 +557,29 @@ class ResultuploadController extends Controller
         $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
         $thesubject = $request->input('subject');
         $thefaculty = $request->input('faculty');
-        $getCourseCode= DB::table('subjects')->where('subjectid', $thesubject)->first();
+        $getCourseCode= DB::table('courses')->where('id', $thesubject)->first();
 
         $subject = $request->input('subject');
         //$session = $request->input('session');
         // $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
-        $subjectcode = DB::table('subjects')->where('SubjectID', $thesubject)->first();
-        $subjectcodename = $subjectcode->SubjectCode;
+        $subjectcode = DB::table('courses')->where('id', $thesubject)->first();
+        $subjectcodename = $subjectcode->CourseCode;
         $thesession = $sessions->SessionYear;
         //$subject = $request->input('subject');
 
         if($thefaculty != 0){
         $faculty = DB::table('faculties')->where('facultyid', $thefaculty)->first();
-        $CourseCode = $getCourseCode->SubjectCode.'-'.$faculty->FacultyName;
+        $CourseCode = $getCourseCode->CourseCode;
+        // $CourseCode = $getCourseCode->CourseCode.'-'.$faculty->FacultyName;
 
-        $studentcomb = DB::table('students')->select('Major', 'Minor')->where('FacultyName', $faculty->FacultyName)->where('major', '!=',null)->where('minor', '!=',null)->where('major', '!=', '')->where('minor', '!=', '')->groupby('Major', 'Minor')->get();
 
         $CourseDept = DB::table('departments')->select('departmantid')->where('Facultyid', $thefaculty)->get();
-
-        $ideptcode = "";
-        foreach($studentcomb as $cdept){
-            $ideptcode .= "'".$cdept->Major.'/'.$cdept->Minor."'".', ';
-        }
-
-        $thedept = rtrim($ideptcode, ', ');
-
-
-        $subjectcombine = DB::table('subjectcombinations')->select('subjectcombinid')
-        ->whereRaw('subjectcombinname in ('.$thedept.')')
-        ->get();
-
-        $isubcomb = "";
-        foreach($subjectcombine as $subcom){
-            $isubcomb .= $subcom->subjectcombinid.', ';
-        }
-
-        $thesubcomb = rtrim($isubcomb, ', '); 
-
-            
 
         $prevdownload = DB::table('results')
         ->select('MatricNo', 'CA', 'EXAM', 'created_at')
         ->where('subjectid', $thesubject)
         ->where('sessionid', $sessions->SessionID)
-        ->whereRaw('subjectcombinid in ('.$thesubcomb.')')
+        // ->whereRaw('subjectcombinid in ('.$thesubcomb.')')
         ->orderby('matricno')
         ->get();
     } else {
@@ -670,8 +636,8 @@ class ResultuploadController extends Controller
         //$items = Item::all();
         $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
         $thesubject = $request->input('subject');
-        $getCourseCode= DB::table('subjects')->where('subjectid', $thesubject)->first();
-        $CourseCode = $getCourseCode->SubjectCode;
+        $getCourseCode= DB::table('courses')->where('id', $thesubject)->first();
+        $CourseCode = $getCourseCode->CourseCode;
         
         $results = DB::table('results')
         ->select('matricno', 'ca', 'exam')

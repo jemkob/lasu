@@ -43,7 +43,7 @@
                     <td><label>Phone Number</label>&nbsp;</td>
                     <td><input type="tel" name="phone" id="phone" class="form-control" placeholder="Phone Number"/></td>
                   </tr>
-                  <tr>
+                  {{-- <tr>
                     <td><label for="">School</label></td>
                     <td>
                             <select class="form-control" name="faculties" id="faculties">
@@ -61,8 +61,8 @@
                                     <option value="0" disable="true" selected="true">--- Select Department ---</option>
                                   </select>
                     </td>
-                  </tr>
-                  <tr>
+                  </tr> --}}
+                  {{-- <tr>
                     <td><label for="">Rank</label></td>
                     <td>
                             <select class="form-control" name="rank" id="rank">
@@ -72,7 +72,7 @@
                                 @endforeach
                             </select>
                     </td>
-                  </tr>
+                  </tr> --}}
                   
                   <tr>
                         <td></td>

@@ -26,11 +26,12 @@
                     <h4 class="page-title">Course Registration</h4>
                 </div>
             </div>
+            
             <!-- /.row -->
             <!-- .row -->
             <div class="box-body">
-            @if(isset($student) && $student->Registered === 'True')
-            <div class="alert alert-warning">You have registered for this session, visit STEP B for modifications or corrections.</div>
+            @if(isset($student) && Auth::user()->Registered === 'TRUE')
+            <div class="alert alert-warning">You have registered for this session, click on the exam docket link to see registered courses or visit Administrative office for modifications or corrections.</div>
             @else
             
                 <div class="row">
@@ -45,7 +46,7 @@
                     <div class="col-md-3">
                     </div>
                     <p>
-                         <h3>Outstandings</h3>
+                         <h3><u>Outstandings</u></h3>
                     </p>
                     <?php
 
@@ -67,6 +68,9 @@
                     });
                     //outstanding ends
         ?>
+        <?php if($_SERVER['REMOTE_ADDR'] == '41.223.65.6'){
+            //dd($diff);
+        } ?>
                     
                 @if(count($registeredcourses) > 0)
                 <div class="table-responsive">
@@ -74,8 +78,8 @@
                     @foreach($diff as $os)
                         <tr>
                             <td scope="col" width="5px">
-                                <input type="checkbox" name="coursed[]" id="{{$os->subjectcodeco}}" value="{{$os->SubjectID}}" checked disabled>
-                                <input type="hidden" name="course[]" value="{{$os->SubjectID}}">
+                                <input type="checkbox" name="coursed[]" id="{{$os->subjectcodeco}}" value="{{$os->subjectid}}" checked disabled>
+                                <input type="hidden" name="course[]" value="{{$os->subjectid}}">
                                 {{-- <input type="hidden" name="course[]" value="{{$os->SubjectID}}"> --}}
 
                             </td>
@@ -83,13 +87,13 @@
                                 <label for="{{$os->subjectcodeco}}">{{$os->subjectcodeco}}</label>
                             </td>
                             <td>
-                                {{$os->SubjectName}}
+                                {{$os->CourseCode}}
                             </td>
                             <td>
-                                {{$os->SubjectValue}}
+                                {{$os->CourseUnit}}
                             </td>
                             <td>
-                                {{$os->SubjectUnit}}
+                                {{$os->CourseStatus}}
                             </td>
                         </tr>
                     @endforeach
@@ -99,30 +103,30 @@
                     
 
                     <p>
-                        <h3>CARRYOVERS</h3>
+                        <h3><u>Carryovers</u></h3>
                     </p>
                     <div class="table-responsive">
                         <table class="table table-striped" width="100%">
                             
-                            <?php $carryover = collect($carryover)->where('SubjectUnit','!=', 'R');
+                            <?php $carryover = collect($carryover);
                             $carryover->all(); ?>
                         @foreach($carryover as $co)
                             <tr>
                                 <td scope="col" width="5px">
-                                    <input type="checkbox" name="course[]" id="{{$co->SubjectCode}}" value="{{$co->SubjectID}}" checked disabled>
-                                    <input type="hidden" name="course[]" value="{{$co->SubjectID}}">
+                                    <input type="checkbox" name="course[]" id="{{$co->CourseCode}}" value="{{$co->SubjectID}}" checked disabled>
+                                    <input type="hidden" name="course[]" value="{{$co->CourseID}}">
                                 </td>
                                 <td>
-                                    <label for="{{$co->SubjectCode}}">{{$co->SubjectCode}}</label>
+                                    <label for="{{$co->CourseCode}}">{{$co->CourseCode}}</label>
                                 </td>
                                 <td>
-                                    {{$co->SubjectName}}
+                                    {{$co->CourseTitle}}
                                 </td>
                                 <td>
-                                    {{$co->SubjectValue}}
+                                    {{$co->CourseUnit}}
                                 </td>
                                 <td>
-                                    {{$co->SubjectUnit}}
+                                    {{$co->CourseStatus}}
                                 </td>
                             </tr>
                         @endforeach
@@ -130,31 +134,31 @@
                     </div>
                     <hr />
                     <p>
-                        <h3>1st Semester</h3>
+                        <h3>Module Courses</h3>
                     </p>
                     <?php
-                    $firstsemester = collect($CurrentCourses)->where('Semester', 1);
+                    $firstsemester = collect($CurrentCourses);
                     
                     $firstsemester->all();
                     ?>
                     <div class="table-responsive">
                             <table class="table table-striped" width="100%">
-                            @foreach($firstsemester as $first)
+                            @foreach($CurrentCourses as $first)
                                 <tr>
                                     <td scope="col" width="5px">
-                                        <input type="checkbox" name="course[]" id="{{$first->SubjectCode}}" value="{{$first->SubjectID}}">
+                                        <input type="checkbox" name="course[]" id="{{$first->CourseCode}}" value="{{$first->CourseID}}">
                                     </td>
                                     <td>
-                                        <label for="{{$first->SubjectCode}}">{{$first->SubjectCode}}</label>
+                                        <label for="{{$first->CourseCode}}">{{$first->CourseCode}}</label>
                                     </td>
                                     <td>
-                                        {{$first->SubjectName}}
+                                        {{$first->CourseTitle}}
                                     </td>
                                     <td>
-                                        {{$first->SubjectValue}}
+                                        {{$first->CourseUnit}}
                                     </td>
                                     <td>
-                                        {{$first->SubjectUnit}}
+                                        {{$first->CourseStatus}}
                                     </td>
                                 </tr>
                             @endforeach
@@ -162,45 +166,15 @@
                         </div>
 
                     <hr />
-                    <p>
-                        <h3>2nd Semester</h3>
-                    </p>
-                    <?php
-                    $secondsemester = collect($CurrentCourses)->where('Semester', 2);
                     
-                    $secondsemester->all();
-                    ?>
-                    <div class="table-responsive">
-                            <table class="table table-striped" width="100%">
-                            @foreach($secondsemester as $second)
-                                <tr>
-                                    <td scope="col" width="5px">
-                                        <input type="checkbox" name="course[]" id="{{$second->SubjectCode}}" value="{{$second->SubjectID}}">
-                                    </td>
-                                    <td>
-                                        <label for="{{$second->SubjectCode}}">{{$second->SubjectCode}}</label>
-                                    </td>
-                                    <td>
-                                        {{$second->SubjectName}}
-                                    </td>
-                                    <td>
-                                        {{$second->SubjectValue}}
-                                    </td>
-                                    <td>
-                                        {{$second->SubjectUnit}}
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </table>
-                        </div>
-                        
+                    
                         <a name="C4"></a>
                         <a href='#C4' onclick="CheckAll()" class="btn btn-danger">Check All</a>
 
                         <div id="error"></div>
 
-                    
-                    <div align='center'><button type="submit" class="btn btn-success">Register Selected Course(s)</button>
+                    <div align='center'>
+                        <button type="submit" id="myBtn" class="btn btn-success" onclick="disableBtn()">Register Selected Course(s)</button>
                     </div>
                     </form>
                 </div>{{-- /row --}}
@@ -218,6 +192,16 @@ function CheckAll() {
         }
     }
 }
+function disableBtn() {
+//   document.getElementById("myBtn").disabled = true;
+  var x = document.getElementById("myBtn");
+  if(x.style.display ==="none"){
+      x.style.display = "block";
+  } else {
+      x.style.display = "none";
+  }
+}
 </script>
+
 
 @endsection

@@ -18,67 +18,51 @@ class CurriculumController extends Controller
     public function index()
     {
         //
-        $faculties = DB::table('faculties')->get();
         $departments = DB::table('departments')->get();
         $sessions = DB::table('sessions')->get();
-        $programmes = DB::table('subjectcombinations')->get();
+        // $programmes = DB::table('subjectcombinations')->get();
+        $faculties = DB::table('faculties')->get();
 
-        $curriculums = DB::table('allcombineds')
-        ->join('subjects', 'allcombineds.SubjectID', '=', 'subjects.SubjectID')
-        ->join('subjectcombinations', 'allcombineds.SubjectCombineID', '=', 'subjectcombinations.SubjectCombinID')
-        ->join('departments', 'allcombineds.DepartmentID', '=', 'departments.DepartmantID')
-        ->select('allcombineds.*', 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid')
-        ->where('allcombineds.SubjectCombineID', 41)
-        ->where('allcombineds.DepartmentID', 7)
-        ->where('subjects.semester', 2)
-        ->where('subjects.subjectlevel', 100)
-        ->where('departments.facultyid', 2)
+        $curriculums = DB::table('allcombinedcourses')
         ->paginate(50);
 
-        return view('CurriculumManager.index')->with('curriculums', $curriculums)->with('faculties', $faculties)->with('departments', $departments)->with('sessions', $sessions)->with('programmes', $programmes);
+        return view('CurriculumManager.index')->with(compact('curriculums', 'faculties', 'departments', 'sessions'));
     }
 
     public function search(Request $request)
         {
         //get all data again
-        $faculties = DB::table('faculties')->get();
         $departments = DB::table('departments')->get();
         $sessions = DB::table('sessions')->get();
-        $programmes = DB::table('subjectcombinations')->get();
 
 
         // Gets the query string from our form submission 
         $faculty = $request->input('faculties');
         $department = $request->input('departments');
-        // $semester = $request->input('semester');
         $thesession = $request->input('sessions');
-        $programme = $request->input('programmes');
         $level = $request->input('level');
 
-            $currentcuriculum = DB::table('curricullums')->where('iscurrent', true)->first();
-            $curriculuminplace = $currentcuriculum->CurricullumID;
-            if($level >= 300){
-                $curriculuminplace = 1;
-            }
+        $faculties = DB::table('faculties')->get();
+            
 
         $curriculumsview = DB::table('allcombinedcourses')
         // ->join('subjects', 'allcombinedcourses.SubjectID', '=', 'subjects.SubjectID')
-        ->join('subjectcombinations', 'allcombinedcourses.SubjectCombineID', '=', 'subjectcombinations.SubjectCombinID')
-        ->join('departments', 'allcombinedcourses.DepartmentID', '=', 'departments.DepartmantID')
-        ->select('allcombinedcourses.*', 'allcombinedcourses.subjectname as subjectname', 'allcombinedcourses.subjectcode as subjectcode', 'allcombinedcourses.subjectunit as subjectunit', 'allcombinedcourses.subjectvalue as subjectvalue', 'allcombinedcourses.subjectid as subjectid')
-        ->where('allcombinedcourses.SubjectCombineID', $programme)
+        ->leftjoin('department', 'allcombinedcourses.DepartmentID', '=', 'department.DepartmentID')
+        ->select('allcombinedcourses.*', 'allcombinedcourses.coursetitle as coursetitle', 'allcombinedcourses.coursecode as coursecode', 'allcombinedcourses.courseunit as courseunit', 'allcombinedcourses.coursestatus as coursestatus', 'allcombinedcourses.courseid as courseid')
+        ->where('allcombinedcourses.departmentid', $department)
         ->where('allcombinedcourses.sessionid', $thesession)
         // ->where('subjects.semester', $semester)
-        ->where('allcombinedcourses.subjectlevel', $level)
+        ->where('allcombinedcourses.courselevel', $level)
         // ->where('curricullumID', $curriculuminplace)
         //->where('departments.facultyid', $faculty)
-        ->orderby('allcombinedcourses.subjectcode')
+        ->orderby('allcombinedcourses.coursecode')
         ->get();
+
 
             
             
         // returns a view and passes the view the list of curriculum and the original query.
-        return view('CurriculumManager.index')->with('curriculumsview', $curriculumsview)->with('faculties', $faculties)->with('departments', $departments)->with('sessions', $sessions)->with('programmes', $programmes);
+        return view('CurriculumManager.index')->with('curriculumsview', $curriculumsview)->with('faculties', $faculties)->with('departments', $departments)->with('sessions', $sessions);
         }
 
         public function editcourse(Request $request){
@@ -97,9 +81,9 @@ class CurriculumController extends Controller
 
               $iresultid = rtrim($iresultid, ', '); */
 
-             $getdetails = DB::table('subjects')
-            ->select('subjects.subjectcode as subjectcode')
-            ->where('subjectid', $subjectid)
+             $getdetails = DB::table('courses')
+            ->select('coursecode')
+            ->where('id', $subjectid)
             // ->whereRaw('resultid in ('.$iresultid.')')
             ->first(); 
 
@@ -108,37 +92,39 @@ class CurriculumController extends Controller
                 $deletedcourses .= $details->subjectcode.', ';
             }
             $deletedcourses = rtrim($deletedcourses, ', '); */
-            $course = DB::table('allcombinedcourses')->where('allcombinedid', $subcurricullum)->first();
+            $course = DB::table('allcombinedcourses')->where('id', $subcurricullum)->first();
 
-            $resultcheck = DB::table('results')->where('subjectcombinid', $course->SubjectCombineID)
-            ->where('subjectid', $course->SubjectID)
-            ->where('sessionid', $course->sessionid)
-            ->where('subjectcombinid', $course->SubjectCombineID)
-            ->get();
+            // $resultcheck = DB::table('results')->where('subjectcombinid', $course->SubjectCombineID)
+            // ->where('subjectid', $course->SubjectID)
+            // ->where('sessionid', $course->sessionid)
+            // ->where('subjectcombinid', $course->SubjectCombineID)
+            // ->get();
 
-            $examca = 0;
-            foreach($resultcheck as $result){
-                $examca = $examca + $result->CA + $result->EXAM;
-            }
-            if($examca > 0){
-                return redirect(url()->previous())->with('error','You cannot delete a course with score.');
-            }
+            // $examca = 0;
+            // foreach($resultcheck as $result){
+            //     $examca = $examca + $result->CA + $result->EXAM;
+            // }
+            // if($examca > 0){
+            //     return redirect(url()->previous())->with('error','You cannot delete a course with score.');
+            // }
             
-            DB::table('results')
-            ->where('subjectid', $course->SubjectID)
-            ->where('sessionid', $course->sessionid)
-            ->where('subjectcombinid', $course->SubjectCombineID)
-            ->delete();
+            // DB::table('results')
+            // ->where('subjectid', $course->SubjectID)
+            // ->where('sessionid', $course->sessionid)
+            // ->where('subjectcombinid', $course->SubjectCombineID)
+            // ->delete();
+
+            // dd($subcurricullum);
 
             DB::table('allcombinedcourses')
             // ->whereRaw('resultid in ('.$iresultid.')')
-            ->where('allcombinedid', $subcurricullum)
+            ->where('id', $subcurricullum)
             ->delete();
 
             $theurl = url()->previous();            
 
             
-            return redirect($theurl)->with('success', $getdetails->subjectcode.' has been deleted from the Curriculum');
+            return redirect($theurl)->with('success', $getdetails->coursecode.' has been deleted from the Curriculum');
         }
 
 
@@ -155,21 +141,21 @@ class CurriculumController extends Controller
           }
       
           public function jsprogrammes(Request $request){
-            $department_id = $request->input('department_id');
-            //SELECT DISTINCT SubjectCombineID FROM `allcombineds` WHERE DepartmentID = 7
+        //     $department_id = $request->input('department_id');
+        //     //SELECT DISTINCT SubjectCombineID FROM `allcombineds` WHERE DepartmentID = 7
 
-            /* $jsprogrammes = DB::table('allcombineds')
-        ->join('subjectcombinations', 'allcombineds.SubjectCombineID', '=', 'subjectcombinations.SubjectCombinID')
-        ->selectRaw('distinct allcombineds.SubjectCombineID, subjectcombinations.SubjectCombinName as SubjectCombinName, subjectcombinations.SubjectCombinID as SubjectCombinID')
-        //->groupBy('subjectcombineid')
-        ->where('DepartmentID', $department_id)->get(); */
+        //     /* $jsprogrammes = DB::table('allcombineds')
+        // ->join('subjectcombinations', 'allcombineds.SubjectCombineID', '=', 'subjectcombinations.SubjectCombinID')
+        // ->selectRaw('distinct allcombineds.SubjectCombineID, subjectcombinations.SubjectCombinName as SubjectCombinName, subjectcombinations.SubjectCombinID as SubjectCombinID')
+        // //->groupBy('subjectcombineid')
+        // ->where('DepartmentID', $department_id)->get(); */
 
-            $thedepartment = DB::table('departments')->where('DepartmantID', $department_id)->first();
-            $deptcode = $thedepartment->DepartmentCode;
-            $deptlike = $deptcode.'%';
-            //$deptlike2 = '%'.$deptcode;
-            $jsprogrammes = DB::table('subjectcombinations')->where('SubjectCombinName', 'like', $deptlike)->orderby('SubjectCombinName')->get();
-            return response()->json($jsprogrammes);
+        //     $thedepartment = DB::table('departments')->where('DepartmantID', $department_id)->first();
+        //     $deptcode = $thedepartment->DepartmentCode;
+        //     $deptlike = $deptcode.'%';
+        //     //$deptlike2 = '%'.$deptcode;
+        //     $jsprogrammes = DB::table('subjectcombinations')->where('SubjectCombinName', 'like', $deptlike)->orderby('SubjectCombinName')->get();
+        //     return response()->json($jsprogrammes);
           }
 
     public function curriculumcourses(Request $request){
@@ -178,46 +164,28 @@ class CurriculumController extends Controller
         // $combinationid = 80;
         // $session = 8;
 
-        $combinationid = $request->input('combination');
+        $department = $request->input('combination');
         $level = $request->input('level');
         $session = $request->input('sessions');
 
-        $combination = DB::table('subjectcombinations')->where('subjectcombinid', $combinationid)->first();
-        $combination = $combination->SubjectCombinName;
-
-        $major = substr($combination, 0,3);
-        $minor = substr($combination, -3);
+        $departments = DB::table('departments')->where('departmentid', $department)->first();
 
         $lev= substr($level, 0,1);
 
-        // return $lev;
-        if($major == 'BED' && $level == 300){
-            $getcoursesincurriculum = DB::table('allcombinedcourses')
-        // ->leftjoin('allcombinedcourses', 'subjects.subjectid','=','allcombinedcourses.subjectid')
-        ->whereraw('SubjectLevel='.$level.' and sessionid ='.$session.' and subjectcombineid='.$combinationid.' and (subjectcode like "BES%" or SubjectCode like "BEA%" or SubjectCode like "gse%" or SubjectCode like "edu%" or SubjectCode like "esa%")')
-        ->pluck('subjectid');
-
-            $getcourses = DB::table('subjects')
-        // ->leftjoin('allcombinedcourses', 'subjects.subjectid','=','allcombinedcourses.subjectid')
-        ->whereraw('SubjectLevel='.$level.' and (subjectcode like "BEA%" or SubjectCode like "BES%" or SubjectCode like "gse%" or SubjectCode like "edu%" or SubjectCode like "esa%")')
-        ->whereNotIn('subjectid', $getcoursesincurriculum)
-        ->get();
-
-        } else {
 
         $getcoursesincurriculum = DB::table('allcombinedcourses')
         // ->leftjoin('allcombinedcourses', 'subjects.subjectid','=','allcombinedcourses.subjectid')
-        ->whereraw('SubjectLevel='.$level.' and sessionid = '.$session.' and subjectcombineid='.$combinationid.' and (subjectcode like "'.$major.'%" or SubjectCode like "'.$minor.'%" or SubjectCode like "gse%" or SubjectCode like "edu%" or SubjectCode like "esa%")')
-        ->pluck('subjectid');
+        ->whereraw('CourseLevel='.$level.' and sessionid = '.$session.' and departmentid='.$combinationid)
+        ->pluck('courseid');
 
-        $getcourses = DB::table('subjects')
+        $getcourses = DB::table('courses')
         // ->leftjoin('allcombinedcourses', 'subjects.subjectid','=','allcombinedcourses.subjectid')
-        ->whereraw('SubjectLevel='.$level.' and (subjectcode like "'.$major.'%" or SubjectCode like "'.$minor.'%" or SubjectCode like "gse%" or SubjectCode like "edu%" or SubjectCode like "esa%")')
-        ->whereNotIn('subjectid', $getcoursesincurriculum)
+        ->whereraw('CourseLevel='.$level)
+        ->whereNotIn('Id', $getcoursesincurriculum)
         ->get();
 
         
-        }
+        
         
         // return $getcourses;
 
@@ -237,47 +205,35 @@ class CurriculumController extends Controller
         //get form contents
         $faculties = $request->input('faculties');
         $department = $request->input('departments');
-        $semester = $request->input('semester');
         $thesession = $request->input('sessions');
-        $programme = $request->input('programmes');
         $level = $request->input('level');
         
-        $course = $request->input('course');
+        $course = $request->input('subjectid');
         $active = 1;
 
         for($i=0; $i < count($course); $i++){
-            $subject = $course[$i];
-            $getsubject = DB::table('subjects')->where('subjectid', $subject)->first();
-            $deptcode = substr($getsubject->SubjectCode, 0, 3);
-            if($deptcode == 'BEA' || $deptcode == 'BES'){
-                $deptcode = 'BED';
-            }
-            $getsubjectdept = DB::table('departments')->where('departmentcode', $deptcode)->first();
+            $course = $course[$i];
+            $getsubject = DB::table('courses')->where('id', $course)->first();
             
-            if($deptcode == 'ESA'){
-                $getsubjectdept = DB::table('departments')->where('departmentcode', 'DEWS')->first();
-            }
-
-            if($getsubject->SubjectCode == 'EDU 311'){
-                $getsubjectdept = DB::table('departments')->where('departmentcode', 'TP')->first();
-            }
+            $getsubjectdept = DB::table('department')->where('departmentid', $department)->first();
+            
+           
            // echo $matric[$i].' '.$ca[$i].' '.$exam[$i].'<br>';
 
            DB::table('allcombinedcourses')
             ->insert(
                 [
-                'SubjectID'=>$getsubject->SubjectID,
+                'CourseID'=>$getsubject->Id,
                 'CurricullumID'=>$thesession,
                 'SessionID'=>$thesession,
                 
-                'DepartmentID'=>$getsubjectdept->DepartmantID,
-                'SubjectCombineID'=>$programme,
-                'SubjectLevel'=>$getsubject->SubjectLevel,
-                'SubjectCode'=>$getsubject->SubjectCode,
-                'SubjectName'=>$getsubject->SubjectName,
-                'SubjectUnit'=>$getsubject->SubjectUnit,
-                'SubjectValue'=>$getsubject->SubjectValue,
-                'Semester'=>$getsubject->Semester]);
+                'DepartmentID'=>$programme,
+                'CourseLevel'=>$getsubject->CourseLevel,
+                'CourseCode'=>$getsubject->CourseCode,
+                'CourseTitle'=>$getsubject->CourseTitle,
+                'CourseUnit'=>$getsubject->CourseUnit,
+                'CourseStatus'=>$getsubject->CourseStatus
+                ]);
             }
 
         /* $subjects = new Course;
@@ -292,10 +248,9 @@ class CurriculumController extends Controller
 
         // return response()->json('Curriculum Added Successfully.');
 
-        $departments = DB::table('departments')->get();
+        $departments = DB::table('department')->get();
         $sessions = DB::table('sessions')->get();
-        $programmes = DB::table('subjectcombinations')->get();
-        $faculties = DB::table('faculties')->get();
+        $programmes = DB::table('department')->get();
         
         // DB::table('subjects')->insert(
         //     [
@@ -310,7 +265,52 @@ class CurriculumController extends Controller
         //         ]
         // );
 
-        return redirect('CurriculumManager/create')->with('faculties', $faculties)->with('sessions', $sessions)->with('departments', $departments)->with('success', 'Curriculum Added');
+        return redirect('CurriculumManager/create')->with('sessions', $sessions)->with('departments', $departments)->with('success', 'Curriculum Added');
+    }
+
+    public function addtocurriculum(Request $request)
+    {
+        //get form contents
+        $faculties = $request->input('faculties');
+        $department = $request->input('departments');
+        $thesession = $request->input('sessions');
+        $level = $request->input('level');
+        
+        $course = $request->input('course');
+        $active = 1;
+
+        // for($i=0; $i < count($course); $i++){
+            
+            $getsubject = DB::table('courses')->where('id', $course)->first();
+            
+            $getsubjectdept = DB::table('department')->where('departmentid', $department)->first();
+           
+            // }
+            DB::table('allcombinedcourses')
+            ->insert(
+                [
+                'CourseID'=>$getsubject->Id,
+                'SessionID'=>$thesession,
+                
+                'DepartmentID'=>$department,
+                'CourseLevel'=>$getsubject->CourseLevel,
+                'CourseCode'=>$getsubject->CourseCode,
+                'CourseTitle'=>$getsubject->CourseTitle,
+                'CourseUnit'=>$getsubject->CourseUnit,
+                'CourseStatus'=>$getsubject->CourseStatus
+                ]);
+            
+    
+
+        // return response()->json('Curriculum Added Successfully.');
+
+        $departments = DB::table('department')->get();
+        $sessions = DB::table('sessions')->get();
+        $programmes = DB::table('department')->get();
+        $faculties = DB::table('faculties')->get();
+        
+
+        return redirect('CurriculumManager/create')->with('sessions', $sessions)->with('departments', $departments)->with('success', 'Course added to Curriculum.');
     }
 
     public function thecur(Request $request){
@@ -407,9 +407,8 @@ return response()->json('Super Done');
         //
         $departments = DB::table('departments')->get();
         $sessions = DB::table('sessions')->get();
-        $programmes = DB::table('subjectcombinations')->get();
         $faculties = DB::table('faculties')->get();
-        $subjects = DB::table('subjects')->orderby('subjectcode')->get();
+        $subjects = DB::table('courses')->orderby('coursecode')->get();
         return view('CurriculumManager.create')->with('faculties', $faculties)->with('sessions', $sessions)->with('departments', $departments)->with('subjects', $subjects);
     }
 

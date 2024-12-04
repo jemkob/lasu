@@ -11,35 +11,70 @@ $results = DB::table('results')
         //->paginate(20)
         ->get();
 
+        // //get all 100 level result
+        // $resultaddup100 =DB::table('results')
+        // ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+        // ->select('results.ca as ca', 'results.exam as exam', 'subjects.SubjectValue as tnu', 'results.matricno as matricno', 'results.departmentid as departmentid', 'subjects.subjectcode as subjectcodeco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', DB::raw('results.ca + results.exam as examca'))
+        // ->where('results.Level', 100)
+        // //->where('results.Semester', $semester01)
+        // ->where('results.SessionID', $session01-2);
+        // // ->where('results.SubjectCombinID', $programme);
+
+        // //get all 200level results
+        // $resultaddup200 =DB::table('results')
+        // ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+        // ->select('results.ca as ca', 'results.exam as exam', 'subjects.SubjectValue as tnu', 'results.matricno as matricno', 'results.departmentid as departmentid', 'subjects.subjectcode as subjectcodeco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', DB::raw('results.ca + results.exam as examca'))
+        // ->where('results.Level', 200)
+        // //->where('results.Semester', $semester01)
+        // ->where('results.SessionID', $session01-1);
+        // // ->where('results.SubjectCombinID', $programme);
+
+        // //get all 300 level 1st semester results and add to it 100,200 results.
+        // $resultaddup =DB::table('results')
+        // ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+        // ->select('results.ca as ca', 'results.exam as exam', 'subjects.SubjectValue as tnu', 'results.matricno as matricno', 'results.departmentid as departmentid', 'subjects.subjectcode as subjectcodeco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', DB::raw('results.ca + results.exam as examca'))
+        // ->where('results.Level', $level01)
+        // //->where('results.Semester', $semester01)
+        // ->where('results.SessionID', $session01)
+        // // ->where('results.SubjectCombinID', $programme)
+        // ->unionall($resultaddup100)
+        // ->unionall($resultaddup200)
+        // ->get();
+
         //get all 100 level result
         $resultaddup100 =DB::table('results')
         ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
-        ->select('results.ca as ca', 'results.exam as exam', 'subjects.SubjectValue as tnu', 'results.matricno as matricno', 'results.departmentid as departmentid', 'subjects.subjectcode as subjectcodeco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', DB::raw('results.ca + results.exam as examca'))
+        ->select('results.ca as ca', 'results.exam as exam', 'results.tnu as tnu', 'results.matricno as matricno', 'results.departmentid as departmentid', 'subjects.subjectcode as subjectcodeco', 'results.tnu as subjectunitco', 'results.subjectvalue as subjectvalueco', DB::raw('results.ca + results.exam as examca'), 'results.level as rlevel', 'results.semester as rsemester')
         ->where('results.Level', 100)
         //->where('results.Semester', $semester01)
-        ->where('results.SessionID', $session01-2);
+        ->where('results.SessionID', $session01-2)
+        ->where('subjects.subjectunit', '!=', 'R');
         // ->where('results.SubjectCombinID', $programme);
 
         //get all 200level results
         $resultaddup200 =DB::table('results')
         ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
-        ->select('results.ca as ca', 'results.exam as exam', 'subjects.SubjectValue as tnu', 'results.matricno as matricno', 'results.departmentid as departmentid', 'subjects.subjectcode as subjectcodeco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', DB::raw('results.ca + results.exam as examca'))
+        ->select('results.ca as ca', 'results.exam as exam', 'results.tnu as tnu', 'results.matricno as matricno', 'results.departmentid as departmentid', 'subjects.subjectcode as subjectcodeco', 'results.tnu as subjectunitco', 'results.subjectvalue as subjectvalueco', DB::raw('results.ca + results.exam as examca'), 'results.level as rlevel', 'results.semester as rsemester')
         ->where('results.Level', 200)
         //->where('results.Semester', $semester01)
-        ->where('results.SessionID', $session01-1);
+        ->where('results.SessionID', $session01-1)
+        ->where('subjects.subjectunit', '!=', 'R');
         // ->where('results.SubjectCombinID', $programme);
 
         //get all 300 level 1st semester results and add to it 100,200 results.
         $resultaddup =DB::table('results')
         ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
-        ->select('results.ca as ca', 'results.exam as exam', 'subjects.SubjectValue as tnu', 'results.matricno as matricno', 'results.departmentid as departmentid', 'subjects.subjectcode as subjectcodeco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', DB::raw('results.ca + results.exam as examca'))
+        ->select('results.ca as ca', 'results.exam as exam', 'results.tnu as tnu', 'results.matricno as matricno', 'results.departmentid as departmentid', 'subjects.subjectcode as subjectcodeco', 'results.tnu as subjectunitco', 'results.subjectvalue as subjectvalueco', DB::raw('results.ca + results.exam as examca'), 'results.level as rlevel', 'results.semester as rsemester')
         ->where('results.Level', $level01)
         //->where('results.Semester', $semester01)
         ->where('results.SessionID', $session01)
+        ->where('subjects.subjectunit', '!=', 'R')
         // ->where('results.SubjectCombinID', $programme)
-        ->unionall($resultaddup100)
         ->unionall($resultaddup200)
+        ->unionall($resultaddup100)
         ->get();
+
+
         
 
         //gets the first department for display
@@ -58,46 +93,86 @@ $results = DB::table('results')
         $deptcode1 = $getdeptcode1->DepartmentCode;
         $deptid1 = $getdeptcode1->DepartmantID; */
 
-        //100level results
-        $results1100 = DB::table('results')
-        ->leftjoin('departments', 'results.DepartmentID', '=', 'departments.DepartmantID')
-        ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
-        ->groupBy('matricno')
-        //subjectvalue must be greater than 40 to get tnup for total unit passed
-        ->selectRaw('results.matricno as matricno, sum(tnu) as sum, sum(results.tnu) as sum2')
-        ->where('results.Level', 100)
-        //->where('results.Semester', $semester01)
-        ->where('results.SessionID', $session01-2);
-        // ->where('results.SubjectCombinID', $programme)
-        // ->where('departments.DepartmantID', $getid);
+//         //100level results
+//         $results1100 = DB::table('results')
+//         ->leftjoin('departments', 'results.DepartmentID', '=', 'departments.DepartmantID')
+//         ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+//         ->groupBy('matricno')
+//         //subjectvalue must be greater than 40 to get tnup for total unit passed
+//         ->selectRaw('results.matricno as matricno, sum(tnu) as sum, sum(results.tnu) as sum2')
+//         ->where('results.Level', 100)
+//         //->where('results.Semester', $semester01)
+//         ->where('results.SessionID', $session01-2);
+//         // ->where('results.SubjectCombinID', $programme)
+//         // ->where('departments.DepartmantID', $getid);
 
-        //200 level result
-        $results1200= DB::table('results')
-        ->leftjoin('departments', 'results.DepartmentID', '=', 'departments.DepartmantID')
-        ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
-        ->groupBy('matricno')
-        //subjectvalue must be greater than 40 to get tnup for total unit passed
-        ->selectRaw('results.matricno as matricno, sum(tnu) as sum, sum(results.tnu) as sum2')
-        ->where('results.Level', 200)
-        //->where('results.Semester', $semester01)
-        ->where('results.SessionID', $session01-1);
-        // ->where('results.SubjectCombinID', $programme)
-        // ->where('departments.DepartmantID', $getid);
+//         //200 level result
+//         $results1200= DB::table('results')
+//         ->leftjoin('departments', 'results.DepartmentID', '=', 'departments.DepartmantID')
+//         ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+//         ->groupBy('matricno')
+//         //subjectvalue must be greater than 40 to get tnup for total unit passed
+//         ->selectRaw('results.matricno as matricno, sum(tnu) as sum, sum(results.tnu) as sum2')
+//         ->where('results.Level', 200)
+//         //->where('results.Semester', $semester01)
+//         ->where('results.SessionID', $session01-1);
+//         // ->where('results.SubjectCombinID', $programme)
+//         // ->where('departments.DepartmantID', $getid);
 
-        $results1 = DB::table('results')
-        ->leftjoin('departments', 'results.DepartmentID', '=', 'departments.DepartmantID')
-        ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
-        ->selectRaw('results.matricno as matricno, sum(results.tnu) as sum, sum(subjects.SubjectValue) as sum2')
-        ->where('results.Level', $level01)
-        //->where('results.Semester', $semester01)
-        ->where('results.SessionID', $session01)
-        // ->where('results.SubjectCombinID', $programme)
-        // ->where('results.DepartmentID', $getid)
-        ->groupBy('matricno')
-        ->unionall($results1100)
-        ->unionall($results1200)
-        ->get();
-// return $results1;
+//         $results1 = DB::table('results')
+//         ->leftjoin('departments', 'results.DepartmentID', '=', 'departments.DepartmantID')
+//         ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+//         ->selectRaw('results.matricno as matricno, sum(results.tnu) as sum, sum(subjects.SubjectValue) as sum2')
+//         ->where('results.Level', $level01)
+//         //->where('results.Semester', $semester01)
+//         ->where('results.SessionID', $session01)
+//         // ->where('results.SubjectCombinID', $programme)
+//         // ->where('results.DepartmentID', $getid)
+//         ->groupBy('matricno')
+//         ->unionall($results1100)
+//         ->unionall($results1200)
+//         ->get();
+// // return $results1;
+
+//100level results
+$results1100 = DB::table('results')
+->leftjoin('departments', 'results.DepartmentID', '=', 'departments.DepartmantID')
+->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+->groupBy('matricno')
+//subjectvalue must be greater than 40 to get tnup for total unit passed
+->selectRaw('results.matricno as matricno, sum(tnu) as sum, sum(results.tnu) as sum2')
+->where('results.Level', 100)
+//->where('results.Semester', $semester01)
+->where('results.SessionID', $session01-2);
+// ->where('results.SubjectCombinID', $programme)
+// ->where('departments.DepartmantID', $getid);
+
+//200 level result
+$results1200= DB::table('results')
+->leftjoin('departments', 'results.DepartmentID', '=', 'departments.DepartmantID')
+->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+->groupBy('matricno')
+//subjectvalue must be greater than 40 to get tnup for total unit passed
+->selectRaw('results.matricno as matricno, sum(tnu) as sum, sum(results.tnu) as sum2')
+->where('results.Level', 200)
+//->where('results.Semester', $semester01)
+->where('results.SessionID', $session01-1);
+// ->where('results.SubjectCombinID', $programme)
+// ->where('departments.DepartmantID', $getid);
+
+$results1 = DB::table('results')
+->leftjoin('departments', 'results.DepartmentID', '=', 'departments.DepartmantID')
+->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+->selectRaw('results.matricno as matricno, sum(results.tnu) as sum, sum(subjects.SubjectValue) as sum2')
+->where('results.Level', $level01)
+//->where('results.Semester', $semester01)
+->where('results.SessionID', $session01)
+// ->where('results.SubjectCombinID', $programme)
+// ->where('results.DepartmentID', $getid)
+->groupBy('matricno')
+->unionall($results1100)
+->unionall($results1200)
+->get();
 
         
         if($major !== $minor){

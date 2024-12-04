@@ -25,15 +25,7 @@
                 </select>
               </div>
 
-              <div class="form-group">
-                <label for="">Semester</label>
-                <select class="form-control" name="semester" id="semester">
-                  <option value="0" disable="true" selected="true">-- Select Semester --</option>
-                  <option value="1">1st Semester</option> 
-                  <option value="2">2nd Semester</option>
-                </select>
-              </div>
-
+              
               <div class="form-group">
                 <label for="">Matric No.</label>
                 <input type="text" class="form-control" name="matricno" id="matricno">
@@ -58,7 +50,7 @@
   <div>
 
   <table class="table table-striped" style="text-transform:uppercase;" width="70%">
-      <tr><td class="alert alert-success"><h3>{{$results[0]->surname.' '.$results[0]->firstname.' '.$results[0]->middlename}} ({{$results[0]->major.'/'.$results[0]->minor}}) {{$results[0]->matricno}}</h3></td></tr>
+      <tr><td class="alert alert-success"><h3>{{$results[0]->surname.' '.$results[0]->firstname.' '.$results[0]->middlename}}  {{$results[0]->matricno}}</h3></td></tr>
   </table>
 
   <table width="100%" border="1" class="table table-striped table-bordered table-hover">

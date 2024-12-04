@@ -39,6 +39,10 @@ function Validate()
                     {{Form::label('matricno', 'Matric No')}}
                     {{Form::text('MatricNo', $showstudent->MatricNo, ['class' => 'form-control', 'placeholder'=>'Matric No'])}}
                 </div>
+                <div class="form-group">
+                    {{Form::label('admissioncode', 'Admission Code')}}
+                <input type="text" name="MatricNo" value="{{$showstudent->AdmissionCode}}" id="" class="form-control">
+                </div>
 
                 <div class="form-group">
                         {{Form::label('surname', 'Surname')}}
@@ -56,32 +60,33 @@ function Validate()
                 </div>
 
                 
-                <div class="form-group">
-                    {{Form::label('School', 'School Name')}}
-                    {{Form::text('facultyName', $showstudent->FacultyName, ['class' => 'form-control', 'placeholder'=>'School'])}}
-                </div>
 
 
-                <div class="form-group">
+                {{-- <div class="form-group">
                     {{Form::label('SOR', 'State')}}
                     {{Form::text('SOR', $showstudent->SOR, ['class' => 'form-control', 'placeholder'=>'State'])}}
-                </div>
+                </div> --}}
 
-                <div class="form-group">
+                {{-- <div class="form-group">
                     {{Form::label('country', 'Country')}}
                     {{Form::text('country', $showstudent->Nationality, ['class' => 'form-control', 'placeholder'=>'Country'])}}
-                </div>
+                </div> --}}
             </div>
             <div class="col-md-4">
                 
-                <div class="form-group">
+                {{-- <div class="form-group">
                     {{Form::label('Jambregno', 'Jamb Registration No.')}}
                     {{Form::text('JambRegNo', $showstudent->JambRegNo, ['class' => 'form-control', 'placeholder'=>'Jamb Reg No'])}}
-                </div>
+                </div> --}}
 
                 <div class="form-group">
                     <label for="phonenumber">Phone Number</label>
                 <input class="form-control" placeholder="Phone Number" name="phonenumber" type="text" id="phonenumber" value="{{$showstudent->PhoneNumber}}">
+                </div>
+
+                <div class="form-group">
+                    <label for="phonenumber">Sponsor Phone Number</label>
+                <input class="form-control" placeholder="sPhone Number" name="sphonenumber" type="text" id="sphonenumber" value="{{$showstudent->SponsorsPhoneNumber}}">
                 </div>
 
                 <div class="form-group">
@@ -118,11 +123,11 @@ function Validate()
             <div class="col-md-4">
 
                 <div class="form-group">
-                    <label for="religion">Programme (Subject Combination)</label>
+                    <label for="religion">Departmment</label>
                     <select class="form-control" name="combination" id="combination">
-                        <option value="0" disable="true" selected="true">-- Select Combination --</option>
+                        <option value="0" disable="true" selected="true">-- Select Department --</option>
                         @foreach ($program as $key => $value)
-                        <option value="{{$value->SubjectCombinName}}" {{ $value->SubjectCombinName == $showstudent->Major.'/'.$showstudent->Minor ? 'selected="true"' : "" }}>{{$value->SubjectCombinName}}</option>
+                        <option value="{{$value->DepartmentID}}" {{ $value->DepartmentID == $showstudent->Department ? 'selected="true"' : "" }}>{{$value->DepartmentName}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -145,11 +150,11 @@ function Validate()
                     <textarea class="form-control" name="homeaddress" id="homeaddress" rows="3" placeholder="Home Address">{{$showstudent->HomeAddress}}</textarea>
                 </div>
 
-                @if (isset($images->StudentImage))
+                {{-- @if (isset($images->StudentImage))
                 <div class="form-group">
                     <img src="data:image/jpg;base64,{{ chunk_split(base64_encode($images->StudentImage)) }}"  width="200" height="150">
                 </div>
-                @endif
+                @endif --}}
                 <div class="form-group">
                     <span id="errorName5" style="color: red;"></span>
                   <input type="file" name="imagefile" id="imagefile" onchange="return Validate(); this.value=null;return false;"/>

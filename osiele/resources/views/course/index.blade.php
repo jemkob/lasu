@@ -36,10 +36,9 @@
               <tr>
                 <th scope="col">#</th>
                 <th>Subject Name</th>
-                <th nowrap>Subject Code</th>
-                <th nowrap>Subject Value</th>
-                <th nowrap>Subject Unit</th>
-                <th nowrap>Semester</th>
+                <th nowrap>Course Code</th>
+                <th nowrap>Course Status</th>
+                <th nowrap>Course Unit</th>
                 <th nowrap>Subject Level</th>
                 
                 <th scope="col">#</th>
@@ -51,19 +50,18 @@
             @foreach($subjects as $index =>$subject)
               <tr>
                 <th scope="row">{{$index+1}}</th>
-                <td>{{$subject->SubjectName}}</td>
-                <td>{{$subject->SubjectCode}}</td>
-                <td>{{$subject->SubjectValue}}</td>
-                <td>{{$subject->SubjectUnit}}</td>
-                <td>{{$subject->Semester}}</td>
-                <td>{{$subject->SubjectLevel}}</td>
+                <td>{{$subject->CourseTitle}}</td>
+                <td>{{$subject->CourseCode}}</td>
+                <td>{{$subject->CourseStatus}}</td>
+                <td>{{$subject->CourseUnit}}</td>
+                <td>{{$subject->CourseLevel}}</td>
  
-                <td><a href ="/course/{{$subject->SubjectID}}/edit"><i class="fa fa-lg fa-edit"></i></a></td>
+                <td><a href ="/course/{{$subject->Id}}/edit"><i class="fa fa-lg fa-edit"></i></a></td>
                 <td>
                     
                     <form action="{{url('course/delete')}}" method="get">
                       {{csrf_field()}}
-                      <input type="hidden" name="subjectid" value={{$subject->SubjectID}}>
+                      <input type="hidden" name="subjectid" value={{$subject->Id}}>
                       <button class="btn btn-danger" type="submit" onclick="return confirm('Are you sure you want to delete this course? You cannot undo this action');"><i class="fa fa-lg fa-times"></i></button>
                     </form>
 

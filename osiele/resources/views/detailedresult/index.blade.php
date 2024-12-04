@@ -44,12 +44,6 @@
                                         </select>
                                       </div>
                           
-                                      <div class="form-group">
-                                          <label for="">Programmes</label>
-                                          <select class="form-control" name="programmes" id="programmes">
-                                            <option value="0" disable="true" selected="true">--- Select Programme ---</option>
-                                          </select>
-                                        </div>
 
                                   <div class="form-group">
                                         <label for="">Session</label>
@@ -61,14 +55,6 @@
                                         </select>
                                       </div>
                 
-                              <div class="form-group">
-                                <label for="">Semester</label>
-                                <select class="form-control" name="semester" id="semester">
-                                  <option value="0" disable="true" selected="true">-- Select Semester --</option>
-                                  <option value="1">1st Semester</option> 
-                                  <option value="2">2nd Semester</option>
-                                </select>
-                              </div>
                               <div class="form-group">
                                     <label for="">Level</label>
                                     <select class="form-control" name="level" id="level">
@@ -97,8 +83,6 @@
                     <input type="hidden" name="pfaculty" value="{{$faculty}}">
                     <input type="hidden" name="plevel" value="{{$level}}">
                     <input type="hidden" name="pdepartment" value="{{$department}}">
-                    <input type="hidden" name="pprogram" value="{{$programme}}">
-                    <input type="hidden" name="psemester" value="{{$semester}}">
                     <input type="hidden" name="psession" value="{{$session01}}">
                     <button class="btn btn-primary" type="submit">print</button>
                    </form>
@@ -106,11 +90,13 @@
                   <table width="100%" border="0">
                       <tr>
                         <th scope="col" rowspan="5"><img src="../images/logo.png" width="114" height="99" /></th>
-                        <td align="center" scope="col"><h2><strong>FEDERAL COLLEGE OF EDUCATION ABEOKUTA</strong></h2></td>
+                        <td align="center" scope="col"><h2><strong>LAGOS STATE UNIVERSITY, OJO, ABEOKUTA CAMPUS</strong></h2>
+                          <h3>SANDWICH DEGREE PROGRAMME</h3>
+                        </td>
                         <th scope="col">&nbsp;</th>
                       </tr>
                       <tr>
-                        <td align="center"><h4>NCE DETAILED RESULT</h4></td>
+                        <td align="center"><h4>FACULTY OF EDUCATION</h4></td>
                         <th>&nbsp;</th>
                         <td>&nbsp;</td>
                       </tr>
@@ -122,18 +108,15 @@
                       <tr>
                         <td><table width="100%" border="0" cellpadding="1" cellspacing="1">
                           <tr>
-                            <td width="69" scope="col"><strong>SCHOOL</strong></td>
-                            <td width="199" nowrap="nowrap" scope="col"><span id="school">{{$theschool->FacultyName}}</span></td>
-                            <td width="16" scope="col">&nbsp;</td>
-                            <td width="92" scope="col"><strong>PROGRAME</strong></td>
-                            <td width="135" scope="col">{{$theprogramme->SubjectCombinName}}</td>
-                            <td width="45" scope="col">&nbsp;</td>
-                            <td width="51" scope="col"><strong>LEVEL</strong></td>
-                            <td width="42" scope="col">{{$level}}</td>
-                            <td width="86" scope="col"><strong>SEMESTER</strong></td>
-                            <td width="39" scope="col"> {{$semester}}</td>
-                            <td width="67" scope="col"><strong>SESSION</strong></td>
-                            <td width="93" scope="col">{{$thisession->SessionYear}}</td>
+                            
+                            <td  scope="col">&nbsp;</td>
+                            <td  scope="col"><strong>DEPARTMENT</strong></td>
+                            <td  scope="col" nowrap>{{$departmentname->DepartmentName}}</td>
+                            <td  scope="col">&nbsp;</td>
+                            <td  scope="col"><strong>MODULE</strong></td>
+                            <td  scope="col">{{$level}}</td>
+                            <td  scope="col"><strong>SESSION</strong></td>
+                            <td  scope="col">{{$thisession->SessionYear}}</td>
                             </tr>
                         </table></td>
                         <th>&nbsp;</th>
@@ -169,14 +152,18 @@
                    //dump($keyed);
                   ?>
                   <div class="table-responsive">
-                   <table width="1500px" border="2" style="width: 100%; margin-top: 5px; border-top: 1px solid #000; border-bottom: 1px solid #000; border-right: 1px solid #000; border-left: 1px solid #000; font-size: x-small;" >
+                   <table width="1500px" border="2" style="width: 100%; margin-top: 5px; border-top: 1px solid #000; border-bottom: 1px solid #000; border-right: 1px solid #000; border-left: 1px solid #000; font-size: 10px;" class="table-responsive">
                   <tr>   
                    
                     <th></th>
                     <th></th>
                     <th></th>
-                     @foreach($groupedheader->sortbydesc('subjectcodeco')->sortbydesc('departmentid') as $key=>$gee)
+                     {{-- @foreach($groupedheader->sortby('subjectcodeco') as $key=>$gee)
                      <th colspan="4">{{$gee->subjectcodeco}} [{{$gee->subjectunitco}} {{$gee->subjectvalueco}}]</th>
+                      @endforeach --}}
+
+                    @foreach($compulsorycourses as $key=>$gee)
+                    <th colspan="4">{{$gee->subjectcodeco}} [{{$gee->subjectunitco}} {{$gee->subjectvalueco}}]</th>
                       @endforeach
                       <th colspan="4">Current</th>
                       <th>Remark</th>
@@ -186,31 +173,59 @@
                       <th>S/N</th>
                       <th>MatricNo</th>
                       <th>Name</th>
-                      @foreach($groupedheader as $key=>$gee)
+                      @foreach($compulsorycourses as $key=>$gee)
                       <td>CA</td><td>EX</td><td>TO</td><td>GP</td>
                        @endforeach
                        <td>TCP</td><td>TNU</td><td>TNUP</td><td>GP</td>
                        <th>Remark</th>
                   </tr>
-                   @foreach($grouped as $index=>$grp)
+                   @foreach($grouped->sortby('subjectcodeco') as $index=>$grp)
                    <tr>
-                     <td><?php $i = array_search($index, array_keys($grouped->toArray()));?> {{$i+1}}</td>
+                     <td><?php $i = array_search($index, array_keys($grouped->toArray()));?> {{$loop->iteration}}</td>
                      <td>{{$index}}</td>
                      <td >{{$grp[0]->surname}} {{$grp[0]->firstname}} {{$grp[0]->middlename}}  </td>
-                      @foreach($grp->sortby('subjectcodeco') as $key=>$gee)
+
+                      {{-- @foreach($grp->sortby('subjectcodeco') as $key=>$gee)
                       <td>{{$gee->ca}}</td><td>{{$gee->exam}}</td> <td>{{$gee->examca}}</td>
-                      <td>
+                      <td> --}}
                         <?php 
-                        $calculate = $gee->examca;
-                        if ($calculate >= 70)  {$calculates = 5*$gee->tnu;}
-                                elseif ($calculate >= 60 && $calculate <= 69)  {$calculates = 4*$gee->tnu; $gettnup = $gee->tnu;}
-                                elseif ($calculate >= 50 && $calculate <= 59)  {$calculates = 3*$gee->tnu; $gettnup = $gee->tnu;}
-                                elseif ($calculate >= 45 && $calculate <= 49)  {$calculates = 2*$gee->tnu; $gettnup = $gee->tnu;}
-                                elseif ($calculate >= 40 && $calculate <= 44)  {$calculates = 1*$gee->tnu; $gettnup = $gee->tnu;}
-                                elseif ($calculate <= 39)  {$calculates = 0*$gee->tnu; $gettnup = 0;}
+                        // $calculate = $gee->examca;
+                        // if ($calculate >= 70)  {$calculates = 5*$gee->tnu;}
+                        //         elseif ($calculate >= 60 && $calculate <= 69)  {$calculates = 4*$gee->tnu; $gettnup = $gee->tnu;}
+                        //         elseif ($calculate >= 50 && $calculate <= 59)  {$calculates = 3*$gee->tnu; $gettnup = $gee->tnu;}
+                        //         elseif ($calculate >= 45 && $calculate <= 49)  {$calculates = 2*$gee->tnu; $gettnup = $gee->tnu;}
+                                
+                        //         elseif ($calculate < 45)  {$calculates = 0*$gee->tnu; $gettnup = 0;}
                                 ?>
-                                 {{$calculates}}
+                                 {{-- {{$calculates}}
                         </td>
+                      @endforeach --}}
+                      @foreach($compulsorycourses as $cc)
+                        <?php
+                        $gee = $grp->where('subjectcodeco', $cc->subjectcodeco)->first();
+                        ?>
+                        @if(!empty($gee))
+                        <td>{{$gee->ca}}</td><td>{{$gee->exam}}</td> <td>{{$gee->examca}}</td>
+                        <td>
+                          <?php 
+                          $calculate = $gee->examca;
+                          if ($calculate >= 70)  {$calculates = 5*$gee->tnu;}
+                                  elseif ($calculate >= 60 && $calculate <= 69)  {$calculates = 4*$gee->tnu; $gettnup = $gee->tnu;}
+                                  elseif ($calculate >= 50 && $calculate <= 59)  {$calculates = 3*$gee->tnu; $gettnup = $gee->tnu;}
+                                  elseif ($calculate >= 45 && $calculate <= 49)  {$calculates = 2*$gee->tnu; $gettnup = $gee->tnu;}
+                                  
+                                  elseif ($calculate < 45)  {$calculates = 0*$gee->tnu; $gettnup = 0;}
+                                  ?>
+                                  {{$calculates}}
+                          </td>
+                          @else 
+                          <td>0</td>
+                          <td>0</td>
+                          <td>0</td>
+                          <td>0</td>
+                        @endif
+
+                          
                       @endforeach
                       {{-- Get current tnu,tnup, tcp and cgpa --}}
                       <?php
@@ -244,8 +259,7 @@
                                 elseif ($calculate >= 60 && $calculate <= 69)  {$calculates = 4*$resfilt->tnu; $gettnup = $resfilt->tnu;}
                                 elseif ($calculate >= 50 && $calculate <= 59)  {$calculates = 3*$resfilt->tnu; $gettnup = $resfilt->tnu;}
                                 elseif ($calculate >= 45 && $calculate <= 49)  {$calculates = 2*$resfilt->tnu; $gettnup = $resfilt->tnu;}
-                                elseif ($calculate >= 40 && $calculate <= 44)  {$calculates = 1*$resfilt->tnu; $gettnup = $resfilt->tnu;}
-                                elseif ($calculate <= 39)  {$calculates = 0*$resfilt->tnu; $gettnup = 0;}
+                                elseif ($calculate < 45)  {$calculates = 0*$resfilt->tnu; $gettnup = 0;}
                                 //endif
                                 $allcalc +=$calculates;
 
@@ -289,19 +303,6 @@
   
                                   $passed1->all();
   
-                                  if(count($passed1) > 0) {
-                                  echo 'F. ';
-                                    foreach ($resfiltered as $co){
-                                    //$checkco = $co->ca+$co->exam;
-                                      if($co->examca <= 39){                                
-                                      $theco = $co->subjectcodeco. '('.$co->subjectunitco.''.$co->subjectvalueco.'), '.$co->examca;
-                                      echo $theco.' | ';
-                                      }
-                                    }
-                                  } else {
-                                    echo 'Passed ';
-                                  }
-  
                                   $set1='';
                                   $set2='';
                                   $set1 = collect($compulsorycourses); // Contents omitted for brevity
@@ -314,9 +315,22 @@
                                       }
                                   });
   
+                                  if(count($passed1) > 0 || isset($diff) && !empty($diff)) {
+                                  echo 'F. ';
+                                    foreach ($resfiltered as $co){
+                                    //$checkco = $co->ca+$co->exam;
+                                      if($co->examca <= 39){                                
+                                      $theco = $co->subjectcodeco. '('.$co->subjectunitco.''.$co->subjectvalueco.'), '.$co->examca;
+                                      echo $theco.' | ';
+                                      }
+                                    }
+                                  } else {
+                                    echo 'Passed ';
+                                  }
+  
                                   //echo $diff['subjectcodeco'][0];
                                   if((isset($diff)) && !empty($diff)) {
-                                  echo '<b> O/S:</b>';
+                                  echo '<b> O/S: </b>';
                                   foreach($diff as $diffs){
                                   echo $diffs->subjectcodeco. '('.$diffs->subjectunitco.''.$diffs->subjectvalueco.') ';
                                   }
@@ -360,7 +374,7 @@
             $('#programmes').append('<option value="0" disable="true" selected="true">--- Select Programme ---</option>');
 
             $.each(data, function(index, departmentsObj){
-              $('#departments').append('<option value="'+ departmentsObj.DepartmantID +'">'+ departmentsObj.DepartmentName +'</option>');
+              $('#departments').append('<option value="'+ departmentsObj.DepartmentID +'">'+ departmentsObj.DepartmentName +'</option>');
             })
           });
         });

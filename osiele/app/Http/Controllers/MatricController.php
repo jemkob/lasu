@@ -23,15 +23,31 @@ class MatricController extends Controller
         ->wherenull('matricno')
         // ->where('matricno', '=', null)
         ->where('registered', 'true')
+        ->groupby('studentid')
         ->orderby('departments.facultyid')
         ->orderby('departments.departmentcode')
         ->orderby('students.minor')
         ->orderby('students.surname')
         ->get();
         //return 
+        $existing = DB::table('students')
+        ->select('matricno')
+        ->where('level', 100)
+        ->wherenotnull('matricno')
+        ->where('registered', 'true')
+        ->orderbydesc('matricno')
+        ->first();
+
+        $matric = 0;
+        $myear = substr($sessions->SessionYear, 2, 2);
+        $curyear = substr($existing->matricno, 0, 2);
+        if($curyear == $myear){
+            $matric = substr($existing->matricno, 3, 4);
+        }
+
         
           
-        return view('studentmanager.matric')->with('newstudents', $newstudents)->with('sessions', $sessions);
+        return view('studentmanager.matric')->with('newstudents', $newstudents)->with('sessions', $sessions)->with('existing', $existing)->with('matric', $matric);
     }
 
     public function generateMatric()
@@ -40,17 +56,37 @@ class MatricController extends Controller
         ->leftjoin('departments', 'students.major', '=', 'departments.departmentcode')
         ->selectRaw('studentid, matricno, surname, firstname, departments.facultyid as facultyid, major, minor, level')
         ->where('level', 100)
-        ->where('matricno', null)
+        ->wherenull('matricno')
         ->where('registered', 'true')
+        ->groupby('studentid')
         ->orderby('departments.facultyid')
         ->orderby('departments.departmentcode')
         ->orderby('students.minor')
         ->orderby('students.surname')
         ->get();
         //return
+        $existing = DB::table('students')
+        ->select('matricno')
+        ->where('level', 100)
+        ->wherenotnull('matricno')
+        ->where('registered', 'true')
+        ->orderbydesc('matricno')
+        ->first();
+
+        // dd(substr($existing->matricno, 3, 4));
+
+        // return 0;
+
+        
         $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
         $matric = 0; 
         $myear = substr($sessions->SessionYear, 2, 2);
+
+        $curyear = substr($existing->matricno, 0, 2);
+        if($curyear == $myear){
+            $matric = substr($existing->matricno, 3, 4);
+        }
+
          foreach($newstudents as $newstudent){
             $matric++; 
             $matricpad = str_pad($matric, 4, "0", STR_PAD_LEFT); 

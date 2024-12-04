@@ -10,173 +10,64 @@ use Hash;
 class LoginController extends Controller
 {
     //
-    public function suspend($matricno, $session, $semester)
-     {
-        
-        // Gets the query string from our form submission 
-        /* $matricno = $request->input('matricno'); 
-        $session = $request->input('session');
-        $semester = $request->input('semester'); */
-
-        $checkprobation = DB::table('students')->where('matricno', $matricno)->first();
-
-        if(empty($checkprobation->IsProbation)){
-            return redirect('suspension')->with('error', 'Student is not on probation. Please place on probation before effecting suspension.');
-        }
-
-        $currentsession = DB::table('sessions')->max('sessionid');
-        if($semester == 1){
-            DB::table('results')
-            ->where('matricno', $matricno)
-            ->where('sessionid', $session)
-            ->delete();
-
-            $lastsession = DB::table('results')->where('matricno', $matricno)->groupby('sessionid')->orderby('sessionid')->get();
-            if(empty($lastsession)){
-                DB::table('students')->where('matricno', $matricno)->update(['isprobation' => NULL]);
-                return redirect('suspension')->with('success', 'Student returned to 100 Level.');
-            }
-            $abc="";
-            $isession = DB::table('results')->where('matricno', $matricno)->max('sessionid');
-            $sessiondifference = $currentsession - $isession - 1;
-
-            foreach($lastsession as $lsession){
-               
-                DB::table('results')
-                ->where('matricno', $matricno)
-                ->where('sessionid', $lsession->SessionID)
-                ->where('level', $lsession->Level)
-                ->update(['sessionid' => $sessiondifference + $lsession->SessionID]);
-                $abc .= $sessiondifference + $lsession->SessionID.' - ';
-            }
-           
-        } else {
-            DB::table('results')
-            ->where('matricno', $matricno)
-            ->where('sessionid', $session)
-            ->where('semester', $semester)
-            ->delete();
-
-            $lastsession = DB::table('results')->where('matricno', $matricno)->groupby('sessionid')->orderby('sessionid')->get();
-            if(empty($lastsession)){
-                DB::table('students')->where('matricno', $matricno)->update(['isprobation' => NULL]);
-                return redirect('suspension')->with('success', 'Student returned to 100 Level.');
-            }
-
-            $isession = DB::table('results')->where('matricno', $matricno)->max('sessionid');
-            $sessiondifference = $currentsession - $isession - 1;
-
-            foreach($lastsession as $lsession){
-
-                DB::table('results')
-                ->where('matricno', $matricno)
-                ->where('sessionid', $lsession->SessionID)
-                ->where('level', $lsession->Level)
-                ->update(['sessionid' => $sessiondifference + $lsession->SessionID]);
-            }
-        }
-
-        DB::table('students')
-        ->where('matricno', $matricno)
-        ->update(['isprobation' => NULL]);
-        // return redirect('suspension')->with('success', 'Student is no more on suspension.');
-        return redirect()->back()->with('success', 'Student is no more on suspension.');
-
-     }
-
     public function login(Request $request){
 
 
     $username = $request->input('username');
     $password = $request->input('password');
     
-    if (!empty($password) && !empty($username)) {
+    if ($password && $username) {
        $user = DB::table('students')
-       //->join('pinkey', 'students.studentkey', '=', 'pinkey.studentkey')
-       ->where('students.MatricNo', $username)
-       ->orwhere('students.InvoiceNumber', $username)
-       ->orwhere('students.JambRegNo', $username)
+       ->where('MatricNo', $username)
+       ->orwhere('AdmissionCode', $username)
        ->first();
-
-       $pins = DB::table('pins')->where('pinkey', $password)->first();
-
-       if(empty($user) || empty($pins)){
-           return redirect('login')->with('error', 'Invalid Student/wrong PIN.');
-       } 
+        // dd($user);
+        // return $user;
+       if(empty($user)){
+        return redirect('login')->with('error', 'Invalid username or password.');
+            }
+        
        
        $currentsession = DB::table('sessions')->where('currentsession', true)->first();
        $prevsession = $currentsession->SessionID - 1;
 
-       if($user->IsProbation != ""){
-           if($user->IsProbation=='Deferment'){
-            $this->suspend($user->MatricNo, $currentsession, 1);
-            // return 'done';
-           }
+       $checkskip = DB::table('results')
+       ->where('studentid', $user->StudentID)
+       ->where('sessionid', $prevsession)
+       ->first();
 
-           return redirect('login')->with('error', 'Student Under Probation, Type: '.$user->IsProbation);
-       }
-      
-
-    //    $checkskip = DB::table('results')
-    //    ->where('studentid', $user->StudentID)
-    //    ->where('sessionid', $prevsession)
-    //    ->first();
-
-    //    if(empty($checkskip) && $user->Level > 100){
-    //        $this->suspend($user->MatricNo, $currentsession, 1);
-    //     //    return 'dones';
-    //     return redirect('login')->with('error', 'Defferment Consult Step-B');
+    //    if($user->Level > 100){
+    //     return redirect('login')->with('error', 'You currently cannot make payment.');
     //    }
-
-      
+        $surname = strtoupper(trim($user->Surname));
+        $password = strtoupper(trim($password));
+    if($surname == $password){
+        // return $user->Level;
+       
+        Auth::loginUsingId($user->StudentID);
+        return redirect()->route('home');
+        }else{
+            return redirect('login')->with('error', 'Invalid Student/wrong password');
+        }
+    }
 
        //match student key from the key without joining the tables
        $userkey = DB::table('pins')->where('StudentID', $user->StudentID)->first();
 
        $checkpin = DB::table('pins')->where('pinkey', $password)->first();
-       if(($checkpin->StudentID === NULL) && empty($userkey)){
-
-           DB::table('pins')->where('pinid', $checkpin->PinID)->update(['StudentID' => $user->StudentID]);
-
-           Auth::loginUsingId($user->StudentID);
-
-           if(($user->SubCourse === NULL) && ($user->Level >= 300) && ($user->Major == "BED")){
-               return redirect('student/bedas');
-           }
-           
-            return redirect()->route('home');
-            // return redirect('login')->with('success','You can now login with your Matric No./JAMB No. and PIN.');
-       }
-
-
+       
        if(empty($userkey)){
-        return redirect('login')->with('error', 'Invalid Student/wrong PIN.');
+        return redirect('login')->with('error', 'Invalid Student/wrong password');
     }
 
-       if($password === $userkey->PinKey){
-           Auth::loginUsingId($user->StudentID);
+       
 
-           if(($user->SubCourse === NULL) && ($user->Level >= 300) && ($user->Major == "BED")){
-            return redirect('student/bedas');
-        }
-
-            //Auth::loginUsingId($user->id);
-            //$user = User::where('email', $request->email)->first();
-           // Auth::loginUsingId($user->id);
-
-            // if($user->is_admin())
-            // {
-                // return redirect()->route('dashboard');
-            // }
-            return redirect()->route('home');
-        }
+        
+ return redirect()->back()->with('error', 'Invalid Matric/Password');
     }
 
-        return redirect()->back();
-    }
-
+       
     
-
     public function getMatric(Request $request){
         $jambno = $request->input('jambno');
         $getmatric = DB::table('students')

@@ -82,3 +82,11 @@ Route::get('json-courses', 'AjaxController@jscourses');
 
 });//end group routing to protect pages
 
+Route::get('/clearcache', function() {
+    $exitCode = Artisan::call('cache:clear');
+    // $exitCode =Artisan::call('route:cache');
+    $exitCode =Artisan::call('config:cache');
+    $exitCode =Artisan::call('view:clear');
+    return 'Application cache cleared';
+});
+

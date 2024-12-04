@@ -117,10 +117,13 @@
                                       <tr>
                                         <th scope="col">S/N</th>
                                         <th scope="col">MATRIC NO.</th>
+                                        <th scope="col">JAMB NO.</th>
                                         <th scope="col">FULL NAME</th>
                                         <th scope="col">MAJOR</th>
                                         <th scope="col">MINOR</th>
                                         <th scope="col">SCHOOL</th>
+                                        <th scope="col">STATE</th>
+                                        <th scope="col">LGA</th>
                                         <th scope="col">GENDER</th>
                                         <th scope="col">PHONE NO.</th>
                                       </tr></thead> 
@@ -130,9 +133,12 @@
                                     <tr>
                                       <td>{{$key+1}}</td>
                                       <td>{{$stats->matricno}}</td>
+                                      <td>{{$stats->jambregno}}</td>
                                       <td>{{$stats->surname.' '.$stats->firstname.' '.$stats->middlename}}</td>
                                       <td>{{$stats->major}}</td>
                                       <td>{{$stats->minor}}</td>
+                                      <td>{{$stats->sor}}</td>
+                                      <td>{{$stats->lga}}</td>
                                       <td>{{$stats->facultyname}}</td>
                                       <td>{{$stats->gender}}</td>
                                       <td>{{$stats->phonenumber}}</td>

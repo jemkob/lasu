@@ -95,9 +95,10 @@
             @endif
 
             <div class="content">
-                <div class="title m-b-md">
-                    FCEPORTAL OSIELE
-                </div>
+                <div class="title m-b-md" style="font-size: 39px;">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LAGOS STATE UNIVERSITY,
+                     SCHOOL PORTAL &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </div>
 
             <div class="row">
                         <div class="col-6 col-lg-4 bg-warning animate-in-down animate-in-done">
@@ -115,6 +116,18 @@
                             <h3 class="m-b-md"><b>Admin Login</b></h3>
                           </a>
                         </div>
+                        
+                      </div>
+                      
+                      <br>
+
+                      <div class="row">
+                        <div class="col-6 col-lg-4 bg-warning animate-in-down animate-in-done">
+                          <a href="https://lasuextra.fceportal.com:4443/students/login">
+                            <h3 class="m-b-md"><b class="text-dark">Extra Year Student Login</b></h3>
+                          </a>
+                        </div>
+                        
                         
                       </div>
 

@@ -16,69 +16,77 @@ class CourseformController extends Controller
      */
     public function index()
     {
+        if(Auth::user()->MatricNo == NULL){
+            $matricno = Auth::user()->AdmissionCode;
+        }else{
+        $matricno = Auth::user()->MatricNo;
+        }
+
+        $data = $this->checkpayment();
+        if($data && $data['status'] == 0){
+            return redirect(url()->previous())->with('error', 'Registration is not enabled for you. Proceed to lasupay.fceportal.com:8010 to make your payment.'); 
+        }
+
         //StudentID
         $studentid = Auth::user()->StudentID;
         //First Semester
-        $currentsession = DB::table('sessions')->where('currentsession', true)->first();
-        $posts =  DB::table('results')
-            ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
-            ->leftjoin('lecturerprofiles', 'results.subjectid', '=', 'lecturerprofiles.subjectid')
-            ->leftjoin('lecturers', 'lecturerprofiles.lecturerid', '=', 'lecturers.lecturerid')
-            ->leftjoin('students', 'results.matricno', '=', 'students.matricno')
-            //->select('students.*', 'jambdetails.*')
-            ->select('students.*', 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'results.*', 'lecturers.firstname as lectfirstname', 'lecturers.surname as lectlastname')
-            // ->where('results.matricno', $matricno)
-            ->orwhere('results.studentid', $studentid)
-            ->where('results.sessionid', $currentsession->SessionID)
-            ->where('results.semester', 1)
-            ->groupby('results.subjectid')
-            ->orderby('subjects.subjectcode')
-            ->get();
-            // return $posts;
-
-
-            //Second Semester
-            $posts2 =  DB::table('results')
-            ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
-            ->leftjoin('lecturerprofiles', 'results.subjectid', '=', 'lecturerprofiles.subjectid')
-            ->leftjoin('lecturers', 'lecturerprofiles.lecturerid', '=', 'lecturers.lecturerid')
-            ->leftjoin('students', 'results.matricno', '=', 'students.matricno')
-            //->select('students.*', 'jambdetails.*')
-            ->select('students.*', 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'results.*', 'lecturers.firstname as lectfirstname', 'lecturers.surname as lectlastname')
-            ->orwhere('results.studentid', $studentid)
-            ->where('results.sessionid', $currentsession->SessionID)
-            ->where('results.semester', 2)
-            ->groupby('results.subjectid')
-            ->orderby('subjects.subjectcode')
-            ->get();
-            
-
-            $posts2year =  DB::table('students')
-            //DB::table('students')
-            ->join('results', 'students.StudentID', '=', 'results.StudentID')
-            ->join('studentimages', 'students.studentid', '=', 'studentimages.studentid')
-            ->join('sessions', 'results.sessionid', '=', 'sessions.sessionid')
-            ->join('subjects', 'results.subjectid', '=', 'subjects.subjectid')
-            
-            //->select('students.*', 'jambdetails.*')
-            ->select('students.*', 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'results.*', 'sessions.SessionYear as sessionyear', 'studentimages.studentimage as stdimg')
-            ->where('students.studentid', $studentid)
-            ->where('sessions.currentsession', 1)
-            // ->where('results.semester', 2)
-            // ->orwhere('results.semester', 1)
-            ->first();
-            // dd($posts2year);
-
-
-        $lecturers = DB::table('lecturerprofiles')
-        // ->join('lecturers', 'lecturerprofiles.lecturerid', '=', 'lecturers.lecturerid')
-        // ->select('lecturers.firstname as lectfn', 'lecturers.surname as lectsn', 'lecturerprofiles.subjectid as thesubjectid')
-        ->get();
-
+        $currentsession = DB::table('sessions')->where('currentsession', 1)->first();
+        // dd($currentsession->SessionID);
+        // return $studentid;
         $thestudent=DB::table('students')->where('studentid', $studentid)->first();
+        $program =Auth::user()->Department;
+
+        $studentprogramme = DB::table('department')->where('departmentid', $program)->first();
+
+        // $getsubject = DB::table('allcombinedcourses')->where('courseid', $subject)
+                // ->where('departmentid', $programme)->where('sessionid', $cursession)->first();
+
         
+                $posts =  DB::table('results')
+                // ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+                ->leftjoin('allcombinedcourses', 'allcombinedcourses.courseid', '=', 'results.subjectid')
+                ->where('results.studentid', $studentid)
+                ->where('results.sessionid', $currentsession->SessionID)
+                ->where('allcombinedcourses.sessionid', $currentsession->SessionID)
+                ->where('allcombinedcourses.departmentid', $program)
+                // ->groupby('results.subjectid')
+                ->orderby('coursecode')
+                // ->orderby('subjects.subjectcode')
+                ->get();
+            
+
+            // $posts = $posts->unique('coursecode')->sortBy('coursecode');
+
+            // $posts->values()->all();
+
+            // if($_SERVER['REMOTE_ADDR'] != '41.223.65.6'){
+            //     // return $posts;
+            //     // dd($studentprogramme);
+            //     return redirect(url()->previous())->with('error', 'Registration closed for maintenance.');
+            // }
+
         
-        return view('student.courseform')->with('posts', $posts)->with('lecturers', $lecturers)->with('posts2', $posts2)->with('posts2year', $posts2year);
+        return view('student.courseform')->with(compact('posts', 'program', 'matricno', 'currentsession', 'studentprogramme'));
+    }
+
+    public function checkpayment()
+    {
+        // if(Auth::user()->MatricNo == NULL){
+            $matricno = Auth::user()->AdmissionCode;
+        // }else{
+        // $matricno = Auth::user()->MatricNo;
+        // }
+
+       
+        $ch = curl_init('http://lasupay.fceportal.com:8010/getpayment/'.$matricno);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $json = curl_exec($ch);
+        curl_close($ch);
+        $services = json_decode($json, true);
+
+        return $services;
     }
 
     /**

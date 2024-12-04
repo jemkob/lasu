@@ -16,7 +16,7 @@ class OlevelController extends Controller
         $studentmatric = Auth::user()->MatricNo;
         //First Semester
         $posts =  DB::table('students')
-            ->where('MatricNo', $studentmatric)
+            ->where('studentid', $studentmatricid)
             ->get(); 
 
         //Jamb details    

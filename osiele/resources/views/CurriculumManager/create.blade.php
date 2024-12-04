@@ -12,9 +12,8 @@
   </div>
     <div class="box-body">
             <div class="row">
-              <form action="" id="cc">
                     <div class="col-sm-4">
-                      
+                      <form action="{{url('CurriculumManager/addcourse')}}" method="post">
                         
                         {{csrf_field()}}
                               
@@ -36,19 +35,18 @@
                                         </select>
                                       </div>
                           
-                                      <div class="form-group">
-                                          <label for="">Programmes</label>
-                                          <select class="form-control" name="programmes" id="programmes">
-                                            <option value="0" disable="true" selected="true">--- Select Programme ---</option>
-                                          </select>
-                                        </div>
+                                     
 
                                   <div class="form-group">
                                         <label for="">Session</label>
-                                        <select class="form-control" name="sessions" id="sessions">
+                                        <select class="form-control" name="sessions" id="sessions" required>
                                           <option value="0" disable="true" selected="true">-- Select Session --</option>
                                             @foreach ($sessions as $key => $value)
-                                              <option value="{{$value->SessionID}}">{{ $value->SessionYear }}</option>
+                                              @if($value->CurrentSession == 1)
+                                                <option value="{{$value->SessionID}}">{{ $value->SessionYear }} (Current Session)</option>
+                                              @else 
+                                                <option value="{{$value->SessionID}}">{{ $value->SessionYear }}</option>
+                                              @endif
                                             @endforeach
                                         </select>
                                       </div>
@@ -66,42 +64,29 @@
                                     </select>
                                   </div>
                             
-                              
-                      
-                    </div>
-                    <div class="col-sm-12">
-                                <table class="table table-striped" width="100%" id="courses">
-                                  <tr>
-                                    <td></td><td>Course Code</td><td>Title</td><td>Unit</td><td>Status</td>
-                                  </tr>
-
-                                </table>
-                                  <a name="C4"></a>
-                                  <a href='#C4' onclick="CheckAll()" class="btn btn-danger">Check All</a>
-                                  <br><br>
+                              <div class="form-group">
+                                    <label for="">Course</label>
+                                    <select class="form-control" name="course" id="subjectid">
+                                      <option value="0" disable="true" selected="true">-- Select Course--</option>
+                                        @foreach ($subjects as $key => $value)
+                                          <option value="{{$value->Id}}">{{ $value->CourseCode }}</option>
+                                        @endforeach
+                                    </select>
                               </div>
                               
-                              
                               <div class="col-md-6">
-                                <input class="btn btn-primary" id='save' type="submit" value="Save New Curriculum">
+                                <button class="btn btn-primary" type="submit">Save New Curriculum</button>
                             </div>
-                  </form>
+                      </form>
+                    </div>
                   </div>
+                          
+        
+
+
     </div>
 
 </div>
-<script>
- 
-  function CheckAll() {
-      var x = document.getElementsByName("course[]");
-      var i;
-      for (i = 0; i < x.length; i++) {
-          if (x[i].type == "checkbox") {
-              x[i].checked = true;
-          }
-      }
-  }
-  </script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
@@ -119,7 +104,7 @@
             $('#programmes').append('<option value="0" disable="true" selected="true">--- Select Programme ---</option>');
 
             $.each(data, function(index, departmentsObj){
-              $('#departments').append('<option value="'+ departmentsObj.DepartmantID +'">'+ departmentsObj.DepartmentName +'</option>');
+              $('#departments').append('<option value="'+ departmentsObj.DepartmentID +'">'+ departmentsObj.DepartmentName +'</option>');
             })
           });
         });
@@ -137,52 +122,6 @@
             })
           });
         });
-
-        
-
-        $('#level').on('change', function(e){
-          console.log(e);
-          var department_id = e.target.value;
-          var level = $( "#level" ).val();
-          var combination = $( "#programmes" ).val();
-          var session = $( "#sessions" ).val();
-          console.log(combination);
-          $.get('/curriculumcourses?level=' + level + '&combination='+combination+'&sessions='+session,function(data) {
-            console.log(data);
-           
-            $('table#courses').empty();
-            $.each(data, function(index, coursesObj){
-              $('table#courses').append('<tr><td scope="col" width="5px"> <input type="checkbox" name="course[]" id="course" value="'+coursesObj.SubjectID+'"></td><td><label for="'+coursesObj.SubjectCode+'">'+coursesObj.SubjectCode+'</label></td><td>'+coursesObj.SubjectName+'</td> <td>'+coursesObj.SubjectValue+'</td><td>'+coursesObj.SubjectUnit+'</td></tr>');
-            })
-          });
-        });
-
-        // $('form').submit(function(e){
-          $('#cc').on('submit', function(e) {
-          console.log(e);
-
-          
-          var level = $( "#level" ).val();
-          var programmes = $( "#programmes" ).val();
-          var sessions = $( "#sessions" ).val();
-          var faculties = $( "#faculties" ).val();
-          var departments = $( "#departments" ).val();
-          var semester = $( "#semester" ).val();
-          var course = [$( "#course" ).val()];
-         
-          
-          $.get('/addcur?level=' + level + '&programmes='+programmes+'&sessions='+sessions+'&faculties='+faculties+'&departments='+departments+'&semester='+semester+'&course='+course,function(data) {
-            console.log(data);
-           
-            $('table#courses').empty();
-            $.each(data, function(index, coursesObj){
-              $('table#courses').append('<tr><td scope="col" width="5px"> '+coursesObj+'</td></tr>');
-              
-            })
-          }); 
-          return false;
-        });
-   
    
       </script> 
 @endsection

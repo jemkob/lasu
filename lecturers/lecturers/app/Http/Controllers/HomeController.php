@@ -28,8 +28,8 @@ class HomeController extends Controller
         $lecturer = Auth::user()->LecturerID;
         $faculties = DB::table('faculties')->get();
         $subjects = DB::table('lecturerprofiles')
-            ->join('subjects', 'lecturerprofiles.SubjectID', '=', 'subjects.SubjectID')
-            ->select('subjects.SubjectID as subjectid', 'subjects.SubjectCode as subjectcode')
+            ->join('courses', 'lecturerprofiles.SubjectID', '=', 'courses.id')
+            ->select('courses.id as subjectid', 'courses.coursecode as subjectcode')
             ->where('lecturerprofiles.LecturerID', $lecturer)
             ->get();
         
@@ -46,9 +46,9 @@ class HomeController extends Controller
         $thesubject= $thesubject;
         $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
         $studentlist = DB::table('results')
-        ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+        ->leftjoin('courses', 'results.SubjectID', '=', 'courses.id')
         // ->select('studentid', 'matricno', 'ca', 'exam', 'subjectid')
-        ->selectraw('count(results.subjectid) as total, subjects.SubjectCode as subjectcode')
+        ->selectraw('count(results.subjectid) as total, courses.coursecode as subjectcode')
         //->where('ca', 0)
         //->where('exam', 0)
         //->where('matricno', '!=', null)

@@ -24,7 +24,7 @@ class StudentManagerController extends Controller
     {
         
         //return 
-        $users = Student::orderBy('MatricNo')->paginate(100);
+        $users = Student::orderBy('MatricNo')->whereNotNull('Level')->paginate(100);
         //$users = DB::table('students')->take(10)->get();
           
         return view('studentmanager.index')->with('users', $users);
@@ -121,7 +121,8 @@ class StudentManagerController extends Controller
      */
     public function create()
     {
-        return view('studentmanager.create');
+        $departments= DB::table('department')->get();
+        return view('studentmanager.create')->with(compact('departments'));
     }
 
     /**
@@ -133,14 +134,24 @@ class StudentManagerController extends Controller
     public function store(Request $request)
     {
         $student = new Student;
-        $student->Surname = $request->input('Surname');
-        $student->Firstname = $request->input('Firstname');
-        $student->Middlename = $request->input('Middlename');
-        $student->SOR = $request->input('SOR');
-        $student->Nationality = $request->input('country');
+        $student->MatricNo = $request->matricno;
+        $student->Surname = $request->input('surname');
+        $student->Firstname = $request->input('firstname');
+        $student->Middlename = $request->input('middlename');
+        $student->NIN = $request->nin;
+        $student->levelOfEntry = $request->levelofentry;
+        $student->Email = $request->email;
+        $student->PhoneNumber = $request->phone;
+        $student->Gender = $request->gender;
+        $student->Department = $request->department;
+        $student->olevelSitting = $request->olevel;
+        $student->Level = $request->level;
+
         $student->save();
 
-        return redirect('/studentmanager');
+        DB::connection('lasupay')->insert('insert into students (MatricNo, Surname, Firstname, Middlename, NIN, levelOfEntry, Email, PhoneNumber, Gender, Department, olevelSitting, Level) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->matricno, $request->surname, $request->firstname, $request->middlename, $request->nin, $request->levelofentry, $request->email, $request->phone, $request->gender, $request->department, $request->olevel, $request->level]);
+
+        return redirect('/studentmanager')->with('success', 'Student added successfully!');
     }
 
     /**
@@ -170,18 +181,13 @@ class StudentManagerController extends Controller
 
         $majmin = $showstudent->Major.'/'.$showstudent->Minor;
 
-        $program = DB::table('subjectcombinations')
+        $program = DB::table('departments')
         // ->where('subjectcombinname', $majmin)
-        ->orderby('Subjectcombinname')
+        ->orderby('departmentname')
         ->get();
-        $images = DB::table('studentimages')->where('studentid', $id)->first();
-        $pin = DB::table('pins')
-        ->leftjoin('students', 'pins.studentid','=', 'students.studentid')
-        ->select('pins.pinkey')
-        ->where('students.studentid', $id)->first();
 
 
-        return view('studentmanager.edit')->with('showstudent', $showstudent)->with('program', $program)->with('images', $images)->with('pin', $pin);
+        return view('studentmanager.edit')->with('showstudent', $showstudent)->with('program', $program);
     }
 
     /**
@@ -424,6 +430,75 @@ class StudentManagerController extends Controller
     }
     return redirect('studentmanager/fresher')->with('success', 'Students information added to database.');    
 }
+
+public function curindex(){
+    return view('studentmanager.cur');
+}
+
+public function importCurriculumd(Request $request){
+    if($request->file('coursefile'))
+      {
+        $path = $request->file('coursefile')->getRealPath();
+
+
+        Excel::load($path)->each(function (Collection $csvLine) {
+            $admissioncode = $csvLine->get('admissioncode');//ca
+            $matricno = $csvLine->get('matricnumber');//exam
+            $surname = $csvLine->get('surname');
+            $firstname = $csvLine->get('firstname');
+            $othername = $csvLine->get('othername');
+            $sex = $csvLine->get('sex');
+            $department = $csvLine->get('department');
+            $entryyear = $csvLine->get('entry');
+            $duration = $csvLine->get('duration');
+            $levelofentry = $csvLine->get('levelofentry');
+            // $session = $csvLine->get('session');
+
+            DB::table('students')->insert(
+                ['admissioncode'=>$admissioncode,
+                'matricno'=>$matricno,
+                'surname'=> $surname,
+                'firstname'=>$firstname,
+                'middlename'=>$othername,
+                'entrysession'=>$entryyear,
+                'duration'=>$duration,
+                'gender'=>$sex,
+                'levelofentry'=>$levelofentry,
+                'department'=>$department]);
+        
+     });
+    }
+    return redirect('studentmanager/cur')->with('success', 'student added to database.');    
+}
+
+public function importCurriculum(Request $request){
+    if($request->file('coursefile'))
+      {
+        $path = $request->file('coursefile')->getRealPath();
+
+        Excel::load($path)->each(function (Collection $csvLine) {
+            $csvcode = $csvLine->get('coursecode');//ca
+            $csvtitle = $csvLine->get('coursetitle');//exam
+            $csvunit = $csvLine->get('unit');
+            $csvstatus = $csvLine->get('status');
+            $csvdept = $csvLine->get('departmentid');
+            $csvlevel = $csvLine->get('level');
+            // $session = $csvLine->get('session');
+
+            DB::table('allcombinedcourses_copy')->insert(
+                ['coursetitle'=>$csvtitle,
+                'coursecode'=>$csvcode,
+                'courseunit'=> $csvunit,
+                'coursestatus'=>$csvstatus,
+                'courselevel'=>$csvlevel,
+                // 'sessionid'=>$session,
+                'departmentid'=>$csvdept]);
+        
+     });
+    }
+    return redirect('studentmanager/cur')->with('success', 'Curriculum added to database.');    
+}
+
 public function probation(){
     $probation = DB::table('students')->where('isprobation', '!=', NULL)->get();
 // return $probation;
@@ -447,22 +522,23 @@ public function changedeptindex(){
 
 public function changedept(Request $request){
 
-    $studentid = $request->input('matricno');
+    $studentid = $request->input('studentid');
     $dept = $request->input('combination');
-    $student = DB::table('students')->where('matricno', $studentid)->orwhere('jambregno', $studentid)->first();
+    $student = DB::table('students')->where('matricno', $studentid)->first();
     if(!$student){
         return redirect()->back()->with('error', 'Invalid student information.');
     }
+
     if($student->Level != 200){
         return redirect()->back()->with('error', 'Student must be in 200 Level.');
     }
     $combination = DB::table('subjectcombinations')->where('subjectcombinName', $student->Major.'/'.$student->Minor)->first();
 
-    if(!$combination){
+    if(empty($combination)){
         return redirect()->back()->with('error', 'Invalid Subject combination.');
     }
-    $newdept = DB::table('subjectcombinations')->where('subjectcombinName', $dept)->first();
-
+    $newdept = DB::table('subjectcombinations')->where('subjectcombinId', $dept)->first();
+// dd($newdept);
     if(!$newdept){
         return redirect()->back()->with('error', 'Invalid Subject combination.');
     }

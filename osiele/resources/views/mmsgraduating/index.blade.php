@@ -240,13 +240,7 @@
                               <td>{{$result->gender}}</td>
                               <td>{{$result->state}}</td>
                               <td>{{$result->school}}</td>
-                              @if(!empty($result->bedas) && $result->bedas == 'beda')
-                                <td>BED/ACC</td>
-                              @elseif(!empty($result->bedas) && $result->bedas == 'beds')
-                                <td>BED/SEC</td>
-                              @else 
-                                <td>{{$result->major.'/'.$result->minor}}</td>
-                              @endif
+                              
                               <?php
                               //first department
                               $themat = $result->matricno;

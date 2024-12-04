@@ -29,6 +29,8 @@ class HomeController extends Controller
         ->where('studentid', Auth::user()->StudentID)
         ->first();
 
-        return view('home')->with('details', $details);
+        $department = DB::table('department')->where('departmentid', Auth::user()->Department)->first();
+
+        return view('home')->with(compact('details', 'department'));
     }
 }

@@ -169,6 +169,10 @@
       
     <?php $ref = Request::get('ref'); 
     $indexx=substr($ref,-1);
+
+    // if(Auth::user()->Level == 100){
+    //         return redirect()->back()->with('error', 'Payment closed.');
+    //     }
     ?>
 
     <div align="center" class="receipt">

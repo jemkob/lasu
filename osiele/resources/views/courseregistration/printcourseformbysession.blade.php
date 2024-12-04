@@ -141,7 +141,7 @@
       <tr>
           <td colspan="4" style="text-align: center; border: double">STUDENT MATRIC NO :
               {{$students->MatricNo }}</td>
-          <td>@if(strlen($studentimage->StudentImage) > 0)
+          <td>@if(isset($studentimage) && strlen($studentimage->StudentImage) > 0)
               <img src="data:image/jpg;base64,{{ chunk_split(base64_encode($studentimage->StudentImage)) }}" height="100" width="100">
               @else
               <img src="../images/logo.png" height="100" width="100">

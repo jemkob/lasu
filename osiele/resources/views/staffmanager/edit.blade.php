@@ -53,7 +53,7 @@
                     <td><label>Phone Number</label>&nbsp;</td>
                     <td><input type="tel" name="phone" id="phone" class="form-control" placeholder="Phone Number" value="{{$staffs->PhoneNumber}}"/></td>
                   </tr>
-                  <tr>
+                  {{-- <tr>
                     <td><label for="">School</label></td>
                     <td>
                             <select class="form-control" name="faculties" id="faculties">
@@ -84,7 +84,7 @@
                                 @endforeach
                             </select>
                     </td>
-                  </tr>
+                  </tr> --}}
                   
                   <tr>
                         <td></td>

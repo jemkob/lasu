@@ -49,10 +49,21 @@
                         <select class="form-control" name="studentlist" id="studentlist">
                             <option value="school">By School</option>
                             <option value="subjectcombination">By Subject Combination</option>
+                            <option value="schoolbystate">School by state</option>
                             <option value="department">By Department</option>
                             <option value="level">By Level</option>
                             
                         </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="">Session</label>
+                          <select class="form-control" name="session" id="session" required="required">
+                            <option value="" disable="true" selected="true">-- Select Session --</option>
+                              @foreach ($session as $key => $value)
+                                <option value="{{$value->SessionID}}">{{ $value->SessionYear }}</option>
+                              @endforeach
+                          </select>
                         </div>
                         
                 <div class="col-md-6">
@@ -78,9 +89,10 @@
                         <table width="100%" border="0">
                             <tr>
                             <th scope="col" rowspan="5"><img src="../images/logo.png" width="114" height="99" /></th>
-                            <td align="center" scope="col"><h3><strong>FEDERAL COLLEGE OF EDUCATION ABEOKUTA</strong></h3></td>
-                            <th scope="col">&nbsp;</th>
+                            <td align="center" scope="col"><h3><strong>FEDERAL COLLEGE OF EDUCATION ABEOKUTA</strong></h3>{{$sessions->SessionYear}}</td>
+                            <th scope="col">&nbsp; </th>
                             </tr>
+                            
                         </table>
                     </th>
                 </tr>
@@ -151,7 +163,7 @@
                             <tr>
                             <th scope="col" rowspan="5"><img src="../images/logo.png" width="114" height="99" /></th>
                             <td align="center" scope="col"><h3><strong>FEDERAL COLLEGE OF EDUCATION ABEOKUTA</strong></h3></td>
-                            <th scope="col">&nbsp;</th>
+                            <th scope="col">{{$sessions->SessionYear}}</th>
                             </tr>
                         </table>
                     </th>
@@ -216,6 +228,96 @@
             <p>&nbsp;</p>
             <p>&nbsp;</p>
             <p>&nbsp;</p>
+
+            @elseif(isset($schoolbystate) && count($schoolbystate) > 0)
+            {{-- Modified --}}
+            
+            <div class="table-responsive">
+                <table width="100%" border="1" class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>
+                            <table width="100%" border="0">
+                                <tr>
+                                <th scope="col" rowspan="5"><img src="../images/logo.png" width="114" height="99" /></th>
+                                <td align="center" scope="col"><h3><strong>FEDERAL COLLEGE OF EDUCATION ABEOKUTA</strong></h3></td>
+                                <th scope="col">{{$sessions->SessionYear}}</th>
+                                </tr>
+                            </table>
+                        </th>
+                    </tr>
+                    </thead>
+                    <?php 
+                    // dd($schoolbystate);
+                    // $bb = collect($schoolbystate)->where('facultyid', 2)->groupBy('sor');
+                    // $bb->all();
+                    // dd($bb);
+                    ?>
+                    @foreach(collect($faculty)->where('facultyname', '!=', 'DEWS') as $fac)
+                    <?php 
+                    
+                    ?>
+                    <tr>
+                        <td>
+                            <h2 class="bg-success">{{$fac->FacultyName}}</h2>
+                            <?php
+                            // $statistics = collect($school)->where('facultyname', $fac->FacultyName);
+                            // $statistics->all();
+                            ?>
+                        
+                                <table width="100%" border="1">
+                                          <tr>
+                                            <th scope="col">STATE</th>
+                                            <th scope="col">MALE</th>
+                                            <th scope="col">FEMALE</th>
+                                            <th scope="col">100</th>
+                                            <th scope="col">200</th>
+                                            <th scope="col">300</th>                                            <th scope="col">300+</th>
+                                            <th scope="col">TOTAL STUDENTS</th>
+                                          </tr> 
+                                          <?php $alltotal= 0; $totalfemale= 0; $totalmale = 0;?>
+                                          {{-- @dump($statistics) --}}
+                                        @foreach(collect($schoolbystate)->where('facultyid', $fac->FacultyID) as $stats)
+                                       
+                                        <?php 
+                                                                 
+                                            $alltotal += $stats->total;
+                                            $totalfemale += $stats->female;
+                                            $totalmale += $stats->male; ?>
+                                        <tr>
+                                          <td>{{$stats->sor}}</td>
+                                          <td>{{$stats->male}}</td>
+                                          <td>{{$stats->female}}</td>
+                                          <td>{{$stats->L100}}</td>
+                                          <td>{{$stats->L200}}</td>
+                                          <td>{{$stats->L300}}</td>
+                                          <td>{{$stats->L400}}</td>
+                                          <td>{{$stats->male + $stats->female}}</td>
+                                        </tr>
+                                        @endforeach
+                                        <tr>
+                                          <td align="right">TOTAL</td>
+                                          <td>{{$totalmale}}</td>
+                                          <td>{{$totalfemale}}</td>
+                                          <td>{{$totalmale + $totalfemale}}</td>
+                                        </tr>
+                                      </table>
+                        </td>
+                    </tr>
+                    @endforeach
+                    <tr>
+                    <td><h2 class="bg-success">GRAND TOTAL: {{count($allstudents)}}</h2></td>
+                    
+                    </tr>
+                
+                    </table>
+            </div>
+            {{-- End of Modiefied --}}
+    
+            
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
         @else
             <p>No result found</p>
         @endif

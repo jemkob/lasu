@@ -13,36 +13,32 @@
           <td>
 
         
-         {!! Form::open(['action'=> ['CourseController@update', $subjects->SubjectID], 'method' => 'POST']) !!} 
+         {!! Form::open(['action'=> ['CourseController@update', $subjects->Id], 'method' => 'POST']) !!} 
         
          <div class="form-group">
             {{Form::label('subject', 'Subject Name')}}
-            {{Form::text('subjectname', $subjects->SubjectName, ['class' => 'form-control', 'placeholder'=>'Subject Name'])}}
+            {{Form::text('subjectname', $subjects->CourseTitle, ['class' => 'form-control', 'placeholder'=>'Subject Name'])}}
         </div>
 
         <div class="form-group">
                 {{Form::label('subjectcode', 'Subject Code')}}
-                {{Form::text('subjectcode', $subjects->SubjectCode, ['class' => 'form-control', 'placeholder'=>'Subject Code'])}}
+                {{Form::text('subjectcode', $subjects->CourseCode, ['class' => 'form-control', 'placeholder'=>'Course Code eg. ACC 101'])}}
         </div>
 
         <div class="form-group">
-            {{Form::label('subjectvalue', 'Subject Value')}}
-            {{Form::text('subjectvalue', $subjects->SubjectValue, ['class' => 'form-control', 'placeholder'=>'Subject Value'])}}
+            {{Form::label('subjectstatus', 'Subject Status')}}
+            {{Form::text('subjectstatus', $subjects->CourseStatus, ['class' => 'form-control', 'placeholder'=>'Subject Status eg. C'])}}
         </div>
 
         <div class="form-group">
-                {{Form::label('subjectunit', 'Subject Unit')}}
-                {{Form::text('subjectunit', $subjects->SubjectUnit, ['class' => 'form-control', 'placeholder'=>'subjectunit'])}}
+                {{Form::label('subjectunit', 'Course Unit')}}
+                {{Form::text('subjectunit', $subjects->CourseUnit, ['class' => 'form-control', 'placeholder'=>'Course Unit eg. 3'])}}
         </div>
 
-        <div class="form-group">
-            {{Form::label('semester', 'Semester')}}
-            {{Form::text('semester', $subjects->Semester, ['class' => 'form-control', 'placeholder'=>'Semester'])}}
-        </div>
 
         <div class="form-group">
-                {{Form::label('subjectlevel', 'Subject Level')}}
-                {{Form::text('subjectlevel', $subjects->SubjectLevel, ['class' => 'form-control', 'placeholder'=>'Subject Level'])}}
+                {{Form::label('subjectlevel', 'Course Level')}}
+                {{Form::text('subjectlevel', $subjects->CourseLevel, ['class' => 'form-control', 'placeholder'=>'Course Level eg 300'])}}
         </div>
         {{ Form::hidden('_method', 'PUT') }}
         {{Form::submit('Submit', ['class'=>'btn btn-primary'])}}

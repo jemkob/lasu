@@ -28,8 +28,14 @@ Route::post('minmax/update', 'MinmaxController@update');
 //Fresher upload
 Route::post('studentmanager/importfresher', 'StudentManagerController@import');
 Route::get('studentmanager/fresher', 'StudentManagerController@fresherindex');
+
+Route::post('studentmanager/importcur', 'StudentManagerController@importCurriculum');
+Route::get('studentmanager/cur', 'StudentManagerController@curindex');
+
 Route::get('updateserrors', 'StudentManagerController@updateserrors');
 
+Route::get('student/payment', 'PaymentController@payment');
+Route::post('student/verifypayment', 'PaymentController@verifyPayment');
 
 //change of department
 Route::get('studentmanager/changedept', 'StudentManagerController@changedeptindex');
@@ -73,6 +79,7 @@ Route::resource('departmentmanager', 'DepartmentController');
 
 //course registration
 Route::post('courseregistration/search', 'CourseRegistrationController@search');
+Route::post('courseregistration/searchadmissioncode', 'CourseRegistrationController@searchByAdmissionCode');
 Route::post('courseregistration/addcourse', 'CourseRegistrationController@addcourse');
 Route::post('courseregistration/deletecourse', 'CourseRegistrationController@deletecourse');
 
@@ -82,6 +89,9 @@ Route::get('courseregistration/cancel', 'CourseRegistrationController@cancelRegI
 
 Route::post('courseregistration/print', 'CourseRegistrationController@printcourse');
 Route::get('courseregistration/printindex', 'CourseRegistrationController@printindex');
+
+Route::get('courseregistration/admissioncode', 'CourseRegistrationController@admissionCodeIndex');
+
 Route::get('courseregistration/printbysessionindex', 'CourseRegistrationController@printbysessionindex');
 Route::post('courseregistration/printbysession', 'CourseRegistrationController@printcoursebysession');
 
@@ -95,6 +105,7 @@ Route::get('CurriculumManager/deletecourse', 'CurriculumController@deletecourse'
 Route::post('CurriculumManager/newcurriculum', 'CurriculumController@newcurriculum');
 Route::get('addcur', 'CurriculumController@newcurriculum');
 Route::get('thecur', 'CurriculumController@thecur');
+Route::post('CurriculumManager/addcourse', 'CurriculumController@addtocurriculum');
 
 Route::get('courseassignment/remove', 'CourseAssignmentController@RemoveLecturer');
 Route::post('courseassignment/search', 'CourseAssignmentController@SearchAssignment');
@@ -120,7 +131,10 @@ Route::post('graduate/search', 'GraduateController@search');
 Route::resource('graduates', 'GraduateController');
 
 Route::post('summary/search', 'Mms1Controller@search');
+Route::post('graduating/searchgraduating', 'Mms1Controller@searchGraduating');
 Route::post('summary/print', 'Mms1Controller@print');
+Route::get('summary/300plus', 'Mms1Controller@index300plus');
+Route::get('graduating', 'Mms1Controller@indexGraduating');
 Route::resource('summary', 'Mms1Controller');
 
 Route::post('akokasummary/search', 'Mms1AkokaController@search');
@@ -138,11 +152,21 @@ Route::resource('summarypassed', 'SummaryPassedController');
 Route::post('mms2/search', 'Mms2Controller@search');
 Route::resource('mms2', 'Mms2Controller');
 
-Route::post('detailedresult2/search', 'DetailedResult2Controller@search');
-Route::post('detailedresult2/print', 'DetailedResult2Controller@print');
-Route::resource('detailedresult2', 'DetailedResult2Controller');
+// Route::post('detailedresult2/search', 'DetailedResult2Controller@search');
+// Route::post('detailedresult2/print', 'DetailedResult2Controller@print');
+// Route::resource('detailedresult2', 'DetailedResult2Controller');
+
+Route::get('senate/index', 'ResultController@senateIndex');
+Route::post('senate/result', 'ResultController@senateResult');
+
+Route::get('senate/provisional', 'ResultController@provisionalIndex');
+Route::post('senate/provisional', 'ResultController@provisionalResult');
+
+
 
 Route::post('detailedresult/search', 'DetailedResultController@search');
+Route::post('detailedresult2/search', 'DetailedResultController@detailView');
+Route::get('detailedresult2/index', 'DetailedResultController@detailViewIndex');
 Route::post('detailedresult/print', 'DetailedResultController@print');
 Route::resource('detailedresult', 'DetailedResultController');
 
@@ -203,6 +227,8 @@ Route::get('academicstanding', 'ResultviewController@academicindex');
 Route::post('academicstanding', 'ResultviewController@academicstanding');
 
 //upload result
+Route::post('uploadresultcourse', 'ResultviewController@uploadresultcourse');
+Route::post('uploadzeroresult', 'ResultviewController@uploadzeroresult');
 Route::post('uploadresult', 'ResultviewController@uploadresult');
 Route::get('uploadresultindex', 'ResultviewController@uploadresultindex');
 
@@ -259,6 +285,10 @@ Route::post('scoreranges', 'ResultviewController@scoreranges');
 //uploaded score
 Route::get('uploadedscore', 'ResultviewController@uploadedscoreindex');
 Route::post('uploadedscores', 'ResultviewController@uploadedscore');
+
+//uploaded score by level
+Route::get('uploadedscorelevel', 'ResultviewController@uploadedscorelevelindex');
+Route::post('uploadedscoreslevel', 'ResultviewController@uploadedscorelevel');
 
 Route::get('lectureins', 'ResultviewController@insertlecturer');
 

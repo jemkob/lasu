@@ -136,7 +136,8 @@ class StatsController extends Controller
         
      }
      public function studentlistindex(){
-        return view('statistics.studentlist');
+        $session = DB::table('sessions')->get();
+        return view('statistics.studentlist')->with(compact(['session']));
      }
 
      public function studentlist(Request $request)
@@ -144,30 +145,121 @@ class StatsController extends Controller
         
         // Gets the query string from our form submission 
         $studentlist = $request->input('studentlist');
-        $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
+        $dsession = $request->input('session');
+        $sessions = DB::table('sessions')->where('sessionid', $dsession)->first();
+
+        $studentbyresults = DB::table('results')
+        ->select('studentid', 'level', 'matricno')
+        ->where('sessionid', $dsession)
+        ->groupby('studentid')
+        ->get();
 
         if($studentlist =='subjectcombination'){
         $program = DB::table('subjectcombinations')->get();
-        $students = DB::table('students')
-        ->selectraw('level, CONCAT(Major, "/", Minor) as program, count(matricno) as total, sUM(gender="male") AS male, SUM(gender="female") AS female')
+        /* $students = DB::table('students')
+        ->leftjoin('results','results.studentid', '=', 'students.studentid')
+        ->selectraw('results.level, CONCAT(Major, "/", Minor) as program, count(results.matricno) as total, sUM(gender="male") AS male, SUM(gender="female") AS female')
+        ->where('sessionid', $dsession)
         ->where('registered', 'true')
-        ->groupby('major', 'minor', 'level')
+        ->groupby('results.matricno', 'results.level', 'major', 'minor')
+        ->get(); */
+
+        // $alld= DB::table(DB::raw('students st'))
+        // ->select(DB::raw('SUM(gender =\'male\')'),DB::raw('SUM(gender = \'female\')'), 'rs.level')
+        // ->join(DB::raw('(SELECT studentid,  FROM results WHERE sessionid='.$dsession.' GROUP BY studentid) rs'),'rs.studentid','=','st.StudentID')
+        // ->get();
+
+        $students= DB::table(DB::raw('students st'))
+        ->select(DB::raw('SUM(gender =\'male\') as male'),DB::raw('SUM(gender = \'female\') as female'),'rs.level',DB::raw('CONCAT(st.Major, "/", st.Minor) as program'),  DB::raw('count(rs.studentid) as total'))
+        ->join(DB::raw('(SELECT studentid, LEVEL FROM results WHERE sessionid='.$dsession.' GROUP BY studentid) rs'),'rs.studentid','=','st.StudentID')
+        ->groupby('rs.level', 'st.major', 'st.minor')
         ->get();
-        return view('statistics.studentlist')->with('program', $program)->with('students', $students);
+
+        // return $alld;
+        
+
+
+        $session = DB::table('sessions')->get();
+
+        return view('statistics.studentlist')->with(compact(['program', 'students', 'sessions', 'session']));
         // return $students;
         } elseif($studentlist == 'school'){
         $faculty = DB::table('faculties')->where('facultyid', '!=', 6)->get();
-        $school = DB::table('students')
-        ->selectraw('level, facultyname, facultyid, count(studentid) as total, SUM(gender="male") AS male, SUM(gender="female") AS female')
-        ->where('registered', 'true')
-        ->groupby('facultyname', 'level')
+        // $school = DB::table('students')
+        // ->leftjoin('results','results.studentid', '=', 'students.studentid')
+        // ->selectraw('facultyname, facultyid, count(results.studentid) as total, SUM(gender="male") AS male, SUM(gender="female") AS female, results.level')
+        // ->where('registered', 'true')
+        // ->where('sessionid', $dsession)
+        // ->groupby('facultyname', 'results.level')
+        // ->get();
+
+        $school= DB::table(DB::raw('students st'))
+        ->select(DB::raw('SUM(gender =\'male\') as male'),DB::raw('SUM(gender = \'female\') as female'),'rs.level',  DB::raw('count(rs.studentid) as total'), 'st.facultyname', 'st.facultyid')
+        ->join(DB::raw('(SELECT studentid, level FROM results WHERE sessionid='.$dsession.' GROUP BY studentid) rs'),'rs.studentid','=','st.StudentID')
+        ->groupby('st.facultyname','rs.level')
         ->get();
+
+        // $school = DB::table('results')
+        // ->leftjoin('students','results.studentid', '=', 'students.studentid')
+        // ->selectraw('results.level, facultyname, facultyid, count(results.studentid) as total, SUM(gender="male") AS male, SUM(gender="female") AS female')
+        // // ->where('registered', 'true')
+        // ->where('sessionid', $dsession)
+        // ->groupby('facultyname', 'results.matricno', 'results.level')
+        // ->get();
+
+
+
+        // $school = DB::table('students')
+        // ->leftjoin('results','results.studentid', '=', 'students.studentid')
+        // ->selectraw('results.level, facultyname, facultyid, count(results.studentid) as total, SUM(gender="male") AS male, SUM(gender="female") AS female')
+        // ->where('registered', 'true')
+        // ->where('sessionid', $session)
+        // ->groupby('facultyname', 'results.level', 'results.studentid')
+        // ->get();
+
         // return $school;
         $allstudents = DB::table('students')
-        ->where('registered', 'true')
-        ->get();
-        return view('statistics.studentlist')->with('faculty', $faculty)->with('school', $school)->with('allstudents', $allstudents);
-        } 
+            ->leftjoin('results','results.studentid', '=', 'students.studentid')
+            // ->selectraw('sum(results.studentid) as total')
+            ->where('registered', 'true')
+            ->where('sessionid', $dsession)
+            ->groupby('results.studentid')
+            ->get();
+            $session = DB::table('sessions')->get();
+
+        return view('statistics.studentlist')->with(compact(['faculty', 'school', 'allstudents', 'sessions', 'session']));
+        } elseif($studentlist == 'schoolbystate'){
+            $faculty = DB::table('faculties')->where('facultyid', '!=', 6)->get();
+            // $schoolbystate = DB::table('students')
+            // ->leftjoin('results','results.studentid', '=', 'students.studentid')
+            // ->selectraw('results.level, facultyname, facultyid, count(results.studentid) as total, SUM(gender="male") AS male, SUM(gender="female") AS female, SUM(results.level=100) as L100, SUM(results.level=200) as L200, SUM(results.level=300) as L300, SUM(results.level > 300) as L400, sor')
+            // ->where('registered', 'true')
+            // ->where('sessionid', $dsession)
+            // ->groupby('sor','facultyname')
+            // // ->groupby('sor')
+            // ->get();
+
+            $schoolbystate= DB::table(DB::raw('students st'))
+            ->select(DB::raw('SUM(gender =\'male\') as male'),DB::raw('SUM(gender = \'female\') as female'),'rs.level',  DB::raw('count(rs.studentid) as total'), 'st.facultyname', 'st.facultyid', DB::raw('SUM(rs.level=100) as L100'), DB::raw('SUM(rs.level=200) as L200'), DB::raw('SUM(rs.level=300) as L300'), DB::raw('SUM(rs.level > 300) as L400'), 'sor')
+            ->join(DB::raw('(SELECT studentid, level FROM results WHERE sessionid='.$dsession.' GROUP BY studentid) rs'),'rs.studentid','=','st.StudentID')
+            ->groupby('st.sor', 'st.facultyname')
+            ->get();
+            // return $school;
+            $allstudents = DB::table('students')
+            ->leftjoin('results','results.studentid', '=', 'students.studentid')
+            // ->selectraw('sum(results.studentid) as total')
+            ->where('registered', 'true')
+            ->where('sessionid', $dsession)
+            ->groupby('results.studentid')
+            ->get();
+            // return count($allstudents);
+            $session = DB::table('sessions')->get();
+            // $sessions = DB::table('sessions')->where('Session', $session)->first();
+
+
+            // return $schoolbystate;
+            return view('statistics.studentlist')->with(compact(['faculty', 'schoolbystate', 'allstudents', 'sessions', 'session']));
+            } 
      }
 
     public function studentinfoindex(){
@@ -179,7 +271,7 @@ class StatsController extends Controller
 
             $faculty = DB::table('faculties')->get();
             $students = DB::table('students')
-            ->selectraw('level, facultyname, firstname, surname, middlename, major, minor, matricno, gender, phonenumber')
+            ->selectraw('level, facultyname, jambregno, firstname, surname, middlename, major, minor, matricno, gender, phonenumber, lga, sor')
             ->where('registered', 'true')
             ->where('level', $level)
             ->orderby('matricno')

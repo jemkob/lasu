@@ -27,7 +27,7 @@
                                   <select class="form-control" name="subjectid" id="subjectid">
                                       <option value="0" disable="true" selected="true">--- Select Course ---</option>
                                         @foreach ($subjects as $key => $value)
-                                          <option value="{{$value->SubjectID}}">{{ $value->SubjectCode }}</option>
+                                          <option value="{{$value->Id}}">{{ $value->CourseCode }}</option>
                                         @endforeach
                                     </select>
                                   </td>

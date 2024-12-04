@@ -42,21 +42,7 @@ class FresherController extends Controller
             $csvgender = $csvLine->get('gender');
             $csvreligion = $csvLine->get('religion');
             $csvaddress = $csvLine->get('address');
-        /* if($csvca != '[]' || $csvca != NULL){
-            $csvca = 0;
-        }
-        if($csvexam == '' || $csvexam == NULL){
-            $csvexam = 0;
-        } */
-        
-        /* DB::table('results')
-            ->where('results.MatricNo', $csvLine->get('matricno'))
-            ->where('results.SubjectID', $subjectupload)
-            ->where('results.sessionid', $sessions->SessionID)
-            ->where('results.CA', 0)
-            ->orWhere('results.EXAM', 0)
-            //->where('SubjectID', $subjectupload)
-            ->update(['CA' => $csvLine->get('ca'),'EXAM' => $csvLine->get('exam')]); */ 
+
             DB::table('students')->insert(
                 ['firstname'=>$csvfirstname,
                 'surname'=>$csvsurname,
@@ -67,6 +53,39 @@ class FresherController extends Controller
      });
     }
     return redirect('studentmanager/fresher')-with('success', 'Students information added to database.');    
+}
+
+public function curindex(){
+    return view('studentmanager.cur');
+}
+
+public function importCurriculum(Request $request){
+    if($request->file('coursefile'))
+      {
+        $path = $request->file('coursefile')->getRealPath();
+
+        Excel::load($path)->each(function (Collection $csvLine) {
+            $csvcode = $csvLine->get('coursecode');//ca
+            // $csvtitle = $csvLine->get('coursetitle');//exam
+            $csvunit = $csvLine->get('unit');
+            $csvstatus = $csvLine->get('status');
+            $csvdept = $csvLine->get('departmentid');
+            $csvlevel = $csvLine->get('level');
+            // $session = $csvLine->get('session');
+
+            DB::table('allcombinedcourses_copy')->insert(
+                [
+                // 'coursetitle'=>$csvtitle,
+                'coursecode'=>$csvcode,
+                'courseunit'=> $csvunit,
+                'coursestatus'=>$csvstatus,
+                'courselevel'=>$csvlevel,
+                // 'sessionid'=>$session,
+                'departmentid'=>$csvdept]);
+        
+     });
+    }
+    return redirect('studentmanager/cur')-with('success', 'Curriculum added to database.');    
 }
 
     /**

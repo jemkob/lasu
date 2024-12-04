@@ -43,11 +43,15 @@ border-bottom: 1px solid #000; border-top: 1px solid #000; border-left: 1px soli
                         </tr>
                     </thead>
                     <tbody>
+                        @if(!empty($jamb))
                         <tr>
                             <td class="solidborder" colspan="">{{$jamb->RegNo}}</td>
                             <td class="solidborder" colspan="">{{$jamb->Center}}</td>
                             <td class="solidborder" colspan="">{{$jamb->Year}}</td>
                         </tr>
+                        @else 
+                        <tr><td colspan="3">Not available</td></tr>
+                        @endif
       
                     </tbody>
                 </table>

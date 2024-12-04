@@ -185,17 +185,17 @@ $(window).load(function()
     
         <div class="col-md-6">
             <div class="row">
-              <form action="{{url('uploadresult')}}" method="post" enctype="multipart/form-data" onSubmit="return Validate()";>
+              <form action="{{url('uploadresultcourse')}}" method="post" enctype="multipart/form-data" onSubmit="return Validate()";>
                 {{csrf_field()}}
-                <div class="form-group">
+                {{-- <div class="form-group">
                     <label for="">Course Assigned</label>
                     <select class="form-control subject" name="subject" id="subject" required="required">
                       <option value="" disable="true" selected="true">--- Select Course ---</option>
                         @foreach ($subjects as $key => $value)
-                          <option value="{{$value->subjectid}}">{{ $value->subjectcode }}</option>
+                          <option value="{{$value->Id}}">{{ $value->CourseCode. ' => '. $value->CourseTitle}} </option>
                         @endforeach
                     </select>
-                  </div>
+                  </div> --}}
                 <div class="col-md-6">
                     <span id="errorName5" style="color: red;"></span>
                   <input type="file" name="imported-file" id="resultfile" onchange="return Validate(); this.value=null;return false;" required="required"/>

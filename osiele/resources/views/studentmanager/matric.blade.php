@@ -28,7 +28,12 @@
             </thead>
             
             
-            <tbody><?php $matric=0; $myear = substr($sessions->SessionYear, 2, 2);?>
+            <tbody>
+              <?php 
+
+                // $matric=0; 
+                $myear = substr($sessions->SessionYear, 2, 2);
+                ?>
             @foreach($newstudents as $index =>$user)
             <?php 
                 $matric++; 

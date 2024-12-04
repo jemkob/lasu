@@ -15,11 +15,11 @@ class CourseAssignmentController extends Controller
     {
         //
         //$sessions = DB::table('sessions')->get();
-        $courseview = DB::table('subjects')
-        ->join('lecturerprofiles', 'subjects.SubjectID', '=', 'lecturerprofiles.SubjectID')
+        $courseview = DB::table('courses')
+        ->join('lecturerprofiles', 'courses.id', '=', 'lecturerprofiles.SubjectID')
         ->join('lecturers', 'lecturerprofiles.LecturerID', '=', 'lecturers.LecturerID')
-        ->select('subjects.subjectname as subjectname', 'subjects.subjectid as subjectid', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'lecturers.firstname as firstname', 'lecturers.surname as surname', 'lecturerprofiles.Lecturerprofileid as lecturerprofileid')
-        ->orderby('subjects.subjectcode', 'asc')
+        ->select('courses.coursetitle as subjectname', 'courses.id as subjectid', 'courses.coursecode as subjectcode', 'courses.courseunit as subjectunit', 'courses.coursestatus as coursestatus', 'courses.id as subjectid', 'lecturers.firstname as firstname', 'lecturers.surname as surname', 'lecturerprofiles.Lecturerprofileid as lecturerprofileid')
+        ->orderby('courses.coursecode', 'asc')
         ->paginate(50);
 
         return view('courseassignment.index')->with('courseview', $courseview);
@@ -28,10 +28,10 @@ class CourseAssignmentController extends Controller
     {
         //
         //$sessions = DB::table('sessions')->get();
-        $courseview = DB::table('subjects')
-        ->join('lecturerprofiles', 'subjects.SubjectID', '=', 'lecturerprofiles.SubjectID')
+        $courseview = DB::table('courses')
+        ->join('lecturerprofiles', 'courses.id', '=', 'lecturerprofiles.SubjectID')
         ->join('lecturers', 'lecturerprofiles.LecturerID', '=', 'lecturers.LecturerID')
-        ->select( 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'lecturers.firstname as firstname', 'lecturers.surname as surname', 'lecturerprofiles.Lecturerprofileid as lecturerprofileid')
+        ->select('courses.coursetitle as subjectname', 'courses.id as subjectid', 'courses.coursecode as subjectcode', 'courses.courseunit as subjectunit', 'courses.coursestatus as coursestatus', 'courses.id as subjectid', 'lecturers.firstname as firstname', 'lecturers.surname as surname', 'lecturerprofiles.Lecturerprofileid as lecturerprofileid')
         ->paginate(50);
 
         return view('courseassignment.index')->with('courseview', $courseview);
@@ -45,7 +45,7 @@ class CourseAssignmentController extends Controller
     public function create()
     {
         $lecturers = DB::table('lecturers')->orderby('surname')->get();
-        $subjects = DB::table('subjects')->orderby('subjectcode')->get();
+        $subjects = DB::table('courses')->orderby('coursecode')->get();
 
         return view('courseassignment.create')->with('lecturers', $lecturers)->with('subjects', $subjects);
     }
@@ -82,9 +82,10 @@ class CourseAssignmentController extends Controller
     {
         
         $courseview = DB::table('subjects')
-        ->join('lecturerprofiles', 'subjects.SubjectID', '=', 'lecturerprofiles.SubjectID')
+        ->join('lecturerprofiles', 'courses.id', '=', 'lecturerprofiles.SubjectID')
+        ->join('lecturerprofiles', 'courses.id', '=', 'lecturerprofiles.SubjectID')
         ->join('lecturers', 'lecturerprofiles.LecturerID', '=', 'lecturers.LecturerID')
-        ->select( 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'lecturers.firstname as firstname', 'lecturers.surname as surname', 'lecturerprofiles.Lecturerprofileid as lecturerprofileid', 'lecturers.LecturerID as lecturerid', 'subjects.SubjectID as subjectid')
+        ->select( 'courses.subjectname as subjectname', 'courses.subjectcode as subjectcode', 'courses.subjectunit as subjectunit', 'courses.subjectvalue as subjectvalue', 'courses.id as subjectid', 'lecturers.firstname as firstname', 'lecturers.surname as surname', 'lecturerprofiles.Lecturerprofileid as lecturerprofileid', 'lecturers.LecturerID as lecturerid', 'courses.id as subjectid')
         ->where('lecturerprofiles.LecturerID', $id)
         ->get();
 
@@ -98,17 +99,17 @@ class CourseAssignmentController extends Controller
     {
         $id = $request->input('id');
         $courseview = DB::table('lecturerprofiles')
-        ->join('subjects', 'lecturerprofiles.SubjectID', '=', 'subjects.SubjectID')
+        ->join('subjects', 'lecturerprofiles.SubjectID', '=', 'courses.id')
         ->join('lecturers', 'lecturerprofiles.LecturerID', '=', 'lecturers.LecturerID')
-        ->select( 'subjects.subjectname as subjectname', 'subjects.subjectid as subjectid', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'lecturers.firstname as firstname', 'lecturers.lecturerid as lecturerid', 'lecturers.surname as surname', 'lecturerprofiles.Lecturerprofileid as lecturerprofileid')
-        ->where('subjects.SubjectID', $id)
+        ->select( 'courses.subjectname as subjectname', 'courses.id as subjectid', 'courses.subjectcode as subjectcode', 'courses.subjectunit as subjectunit', 'courses.subjectvalue as subjectvalue', 'courses.id as subjectid', 'lecturers.firstname as firstname', 'lecturers.lecturerid as lecturerid', 'lecturers.surname as surname', 'lecturerprofiles.Lecturerprofileid as lecturerprofileid')
+        ->where('courses.id', $id)
         ->first();
 
         $course = DB::table('lecturerprofiles')
-        ->join('subjects', 'lecturerprofiles.SubjectID', '=', 'subjects.SubjectID')
+        ->join('subjects', 'lecturerprofiles.SubjectID', '=', 'courses.id')
         ->join('lecturers', 'lecturerprofiles.LecturerID', '=', 'lecturers.LecturerID')
-        ->select( 'subjects.subjectname as subjectname', 'subjects.subjectid as subjectid', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'lecturers.firstname as firstname', 'lecturers.lecturerid as lecturerid', 'lecturers.surname as surname', 'lecturerprofiles.Lecturerprofileid as lecturerprofileid')
-        ->where('subjects.SubjectID', $id)
+        ->select( 'courses.subjectname as subjectname', 'courses.id as subjectid', 'courses.subjectcode as subjectcode', 'courses.subjectunit as subjectunit', 'courses.subjectvalue as subjectvalue', 'courses.id as subjectid', 'lecturers.firstname as firstname', 'lecturers.lecturerid as lecturerid', 'lecturers.surname as surname', 'lecturerprofiles.Lecturerprofileid as lecturerprofileid')
+        ->where('courses.id', $id)
         ->get();
 
         $lecturers = DB::table('lecturers')->where('surname', '!=', null)->orderby('surname')->get();
@@ -120,15 +121,15 @@ class CourseAssignmentController extends Controller
     public function SearchAssignment(Request $request)
     {
         $id = $request->input('search');
-        $courseview = DB::table('subjects')
-        ->join('lecturerprofiles', 'subjects.SubjectID', '=', 'lecturerprofiles.SubjectID')
+        $courseview = DB::table('courses')
+        ->join('lecturerprofiles', 'courses.id', '=', 'lecturerprofiles.SubjectID')
         ->join('lecturers', 'lecturerprofiles.LecturerID', '=', 'lecturers.LecturerID')
-        ->select( 'subjects.subjectname as subjectname', 'subjects.subjectcode as subjectcode', 'subjects.subjectunit as subjectunit', 'subjects.subjectvalue as subjectvalue', 'subjects.subjectid as subjectid', 'lecturers.firstname as firstname', 'lecturers.surname as surname', 'lecturerprofiles.Lecturerprofileid as lecturerprofileid')
+        ->select( 'courses.coursetitle as subjectname', 'courses.coursecode as subjectcode', 'courses.courseunit as subjectunit', 'courses.coursestatus as subjectvalue', 'courses.id as subjectid', 'lecturers.firstname as firstname', 'lecturers.surname as surname', 'lecturerprofiles.Lecturerprofileid as lecturerprofileid')
         ->where('lecturers.surname', $id)
-        ->orwhere('subjects.subjectcode', 'like', '%'.$id.'%')
-        ->orwhere('subjects.subjectname', 'like', '%'.$id.'%')
+        ->orwhere('courses.coursecode', 'like', '%'.$id.'%')
+        ->orwhere('courses.coursetitle', 'like', '%'.$id.'%')
         ->orwhere('lecturers.firstname', 'like', '%'.$id.'%')
-        ->orderby('subjects.subjectcode', 'asc')
+        ->orderby('courses.coursecode', 'asc')
         ->paginate(50);
 
         return view('courseassignment.index')->with('courseview', $courseview);

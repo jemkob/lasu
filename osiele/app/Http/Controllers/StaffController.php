@@ -65,8 +65,8 @@ class StaffController extends Controller
         $staffs->Password = $defaultpassword;
         $staffs->Email = $request->input('email');
         $staffs->PhoneNumber = $request->input('phone');
-        $staffs->DepartmentID = $request->input('departments');
-        $staffs->StaffRankId = $request->input('rank');
+        // $staffs->DepartmentID = $request->input('departments');
+        // $staffs->StaffRankId = $request->input('rank');
 
         //$sessions->CurrentSession = $request->input('currentsession');
         
@@ -99,7 +99,7 @@ class StaffController extends Controller
     {
         // $staffs = Staff::find($id)
         $staffs = DB::table('lecturers')
-        ->leftjoin('departments', 'departments.departmantid', '=', 'lecturers.departmentid')
+        ->leftjoin('departments', 'departments.departmentid', '=', 'lecturers.departmentid')
         ->leftjoin('staffrank', 'lecturers.staffrankid', '=', 'staffrank.staffrankid')
         ->where('lecturerid', $id)
         ->first();
@@ -134,8 +134,8 @@ class StaffController extends Controller
         $staffs->Password = $request->input('password');
         $staffs->Email = $request->input('email');
         $staffs->PhoneNumber = $request->input('phone');
-        $staffs->DepartmentID = $request->input('departments');
-        $staffs->StaffRankId = $request->input('rank');
+        // $staffs->DepartmentID = $request->input('departments');
+        // $staffs->StaffRankId = $request->input('rank');
 
         
         $staffs->save();

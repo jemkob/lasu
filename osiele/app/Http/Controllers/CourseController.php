@@ -15,7 +15,7 @@ class CourseController extends Controller
      */
     public function index()
     {
-        $subjects = Course::orderBy('SubjectCode','asc')->paginate(100);
+        $subjects = Course::orderBy('CourseCode','asc')->paginate(100);
         //$users = DB::table('students')->take(10)->get();
           
         return view('course.index')->with('subjects', $subjects);
@@ -25,9 +25,9 @@ class CourseController extends Controller
     {
         $search = $request->input('search');
         $search = '%'.$search.'%';
-        $subjects = Course::orderBy('SubjectCode','asc')
-        ->where('subjectcode', 'like', $search)
-        ->orwhere('subjectname', 'like', $search)
+        $subjects = Course::orderBy('CourseCode','asc')
+        ->where('Coursecode', 'like', $search)
+        ->orwhere('coursetitle', 'like', $search)
         ->paginate(100);
         //$users = DB::table('students')->take(10)->get();
           
@@ -53,13 +53,12 @@ class CourseController extends Controller
     public function store(Request $request)
     {
         $subjects = new Course;
-        $subjects->SubjectName = $request->input('subjectname');
-        $subjects->SubjectCode = $request->input('subjectcode');
-        $subjects->SubjectValue = $request->input('subjectvalue');
-        $subjects->SubjectUnit = $request->input('subjectunit');
-        $subjects->Semester = $request->input('subjectsemester');
-        $subjects->SubjectLevel = $request->input('subjectlevel');
-        $subjects->Active = $request->input('active');
+        $subjects->CourseTitle = $request->input('subjectname');
+        $subjects->CourseCode = $request->input('subjectcode');
+        $subjects->CourseStatus = $request->input('subjectstatus');
+        $subjects->CourseUnit = $request->input('subjectunit');
+        $subjects->CourseLevel = $request->input('subjectlevel');
+        // $subjects->Active = $request->input('active');
         $subjects->save();
 
         return redirect('/course')->with('success', 'Course Created');
@@ -101,12 +100,11 @@ class CourseController extends Controller
     public function update(Request $request, $id)
     {
         $subjects = Course::find($id);
-        $subjects->SubjectName = $request->input('subjectname');
-        $subjects->SubjectCode = $request->input('subjectcode');
-        $subjects->SubjectValue = $request->input('subjectvalue');
-        $subjects->SubjectUnit = $request->input('subjectunit');
-        $subjects->Semester = $request->input('semester');
-        $subjects->SubjectLevel = $request->input('subjectlevel');
+        $subjects->CourseTitle = $request->input('subjectname');
+        $subjects->CourseCode = $request->input('subjectcode');
+        $subjects->CourseStatus = $request->input('subjectstatus');
+        $subjects->CourseUnit = $request->input('subjectunit');
+        $subjects->CourseLevel = $request->input('subjectlevel');
         //$subjects->Active = $request->input('active');
 
         $subjects->save();
@@ -119,11 +117,11 @@ class CourseController extends Controller
         $checkcourse = DB::table('results')->where('exam', 0)->where('ca', 0)->where('subjectid', $course)->get();
 
         if(isset($checkcourse) && count($checkcourse) > 0){
-            return redirect('course')->with('error', 'This subject has scores, delete the result for students affected before deleting the course');
+            return redirect('course')->with('error', 'This course has scores, delete the result for students affected before deleting the course');
         } else {
-            DB::table('subjects')->where('subjectid', $course)->delete();
+            DB::table('courses')->where('id', $course)->delete();
 
-            return redirect('course')->with('Success', 'This subject has been deleted from this platform.');
+            return redirect('course')->with('Success', 'This Course has been deleted from this platform.');
         }
     }
 

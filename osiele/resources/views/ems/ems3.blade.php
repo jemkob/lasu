@@ -91,7 +91,7 @@ overflow: visible !important;
                                         <select class="form-control" name="course" id="course">
                                           <option value="0" disable="true" selected="true">--- Select Course ---</option>
                                           @foreach ($subject as $key => $value)
-                                              <option value="{{$value->SubjectID}}">{{ $value->SubjectCode }}</option>
+                                          <option value="{{$value->SubjectID}}">{{ $value->SubjectCode.' - '.$value->SubjectName }}</option>
                                             @endforeach
                                         </select>
                                       </div>

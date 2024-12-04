@@ -48,11 +48,11 @@ $curtime = strtotime($date);
             </div> --}}
 
             <div class="form-group">
-                <label for="">School</label>
-                <select class="form-control" name="faculty" id="faculty" required="required">
-                  <option value="" disable="true" selected="true">--- Select School ---</option>
-                    @foreach ($faculties as $key => $value)
-                      <option value="{{$value->FacultyID}}">{{ $value->FacultyName }}</option>
+                <label for="">Department</label>
+                <select class="form-control" name="department" id="department" required="required">
+                  <option value="" disable="true" selected="true">--- Select Department ---</option>
+                    @foreach ($departments as $key => $value)
+                      <option value="{{$value->DepartmentID}}">{{ $value->DepartmentName }}</option>
                     @endforeach
                 </select>
               </div>

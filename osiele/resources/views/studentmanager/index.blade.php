@@ -36,9 +36,11 @@
               <tr>
                 <th scope="col">#</th>
                 <th scope="col">Matric No.</th>
+                <th scope="col">Admission Code</th>
                 <th scope="col">Last Name</th>
                 <th scope="col">First Name</th>
                 <th scope="col">Middle Name</th>
+                <th scope="col">Level</th>
                 <th scope="col">#</th>
               </tr>
             </thead>
@@ -49,9 +51,11 @@
               <tr>
                 <th scope="row">{{($users->currentPage()-1) * 100 + $index+1}}</th>
                 <td>{{$user->MatricNo}}</td>
+                <td>{{$user->AdmissionCode}}</td>
                 <td>{{$user->Surname}}</td>
                 <td>{{$user->Firstname}}</td>
                 <td>{{$user->Middlename}}</td>
+                <td>{{$user->Level}}</td>
                 <td><a href ="/studentmanager/{{$user->StudentID}}/edit"><i class="fa fa-lg fa-edit"></i></a></td>
                 <td>
                   <form action="{{url('studentmanager/deletestudent')}}" method="post">

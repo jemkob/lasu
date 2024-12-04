@@ -35,12 +35,7 @@
                                         </select>
                                       </div>
                           
-                                      <div class="form-group">
-                                          <label for="">Programmes</label>
-                                          <select class="form-control" name="programmes" id="programmes">
-                                            <option value="0" disable="true" selected="true">--- Select Programme ---</option>
-                                          </select>
-                                        </div>
+                                     
 
                                   <div class="form-group">
                                         <label for="">Session</label>
@@ -110,21 +105,21 @@
                 @foreach($curriculumsview as $index =>$curriculum)
                   <tr>
                     <td scope="row">{{$index+1}}</td>
-                    <td>{{$curriculum->subjectcode}}</td>
-                    <td>{{$curriculum->subjectunit}}</td>
-                    <td>{{$curriculum->subjectvalue}}</td>
-                    <td>{{$curriculum->subjectname}}</td>
+                    <td>{{$curriculum->coursecode}}</td>
+                    <td>{{$curriculum->courseunit}}</td>
+                    <td>{{$curriculum->coursestatus}}</td>
+                    <td>{{$curriculum->coursetitle}}</td>
                     <td>30</td>
-                    <td>60</td>
-                    <td>40</td>
+                    <td>70</td>
+                    <td>45</td>
                     <td nowrap>
                      
                       <form name="form1" method="get" action="{{url('CurriculumManager/deletecourse')}}">
                         {{csrf_field()}} 
                        
-                        <a class="btn btn-primary" href ="/CurriculumManager/{{$curriculum->AllCombinedID}}/edit"><i class="fa fa-lg fa-edit"></i>Edit</a>
-                      <input name="subcurricullum" type="hidden" id="subcurricullum" value="{{$curriculum->AllCombinedID}}">
-                      <input name="subjectid" type="hidden" id="subjectid" value="{{$curriculum->SubjectID}}">
+                        <a class="btn btn-primary" href ="/CurriculumManager/{{$curriculum->Id}}/edit"><i class="fa fa-lg fa-edit"></i>Edit</a>
+                      <input name="subcurricullum" type="hidden" id="subcurricullum" value="{{$curriculum->Id}}">
+                      <input name="subjectid" type="hidden" id="subjectid" value="{{$curriculum->courseid}}">
                       <input class="btn btn-danger" type="submit" name="button" id="button" value="Delete" onclick="return confirm('Are you sure you want to delete the select course(s)? You cannot undo this action');">
                       </form>
                     </td>
@@ -162,7 +157,7 @@
             $('#programmes').append('<option value="0" disable="true" selected="true">--- Select Programme ---</option>');
 
             $.each(data, function(index, departmentsObj){
-              $('#departments').append('<option value="'+ departmentsObj.DepartmantID +'">'+ departmentsObj.DepartmentName +'</option>');
+              $('#departments').append('<option value="'+ departmentsObj.DepartmentID +'">'+ departmentsObj.DepartmentName +'</option>');
             })
           });
         });

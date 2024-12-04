@@ -30,10 +30,7 @@
         <label for="">Session</label>
         <input type="text" class="form-control" name="sess" id="sess" value="{{$results->sessionid}}" readonly>
     </div>
-    <div class="form-group">
-        <label for="">Semester</label>
-        <input type="text" class="form-control" name="sem" id="sem" value="{{$results->Semester}}" readonly>
-    </div>
+  
     <div class="form-group">
         <label for="">Old CA score</label>
         <input type="text" class="form-control" name="oldca" id="oldca" value="{{$results->CA}}" readonly>
@@ -57,18 +54,7 @@
         <input type="number" class="form-control" name="newtotal" id="newtotal" value="@{{ newca -- newexam }}" readonly>
     </div>
 </div>
-    <div class="form-group">
-        <label for="">Reason for rectification</label>
-        <select name="reason" required="required" id="reason">
-            <option value="" disable="true" selected="true">Select Reason for rectification</option>
-            <option value="Wrong Inputation by Lecturer">Wrong Inputation by Lecturer</option>
-            <option value="Wrong Inputation by Dean">Wrong Inputation by Dean</option>
-            <option value="Wrong Inputation">Wrong Inputation</option>
-            <option value="ACB Upgrade">ACB Upgrade</option>
-            <option value="Lecturer Upgrade">Lecturer Upgrade</option>
-            <option value="Zero Score">Zero Score</option>
-        </select>
-    </div>
+    
                               
                               <div class="col-md-6">
                                 <button class="btn btn-primary" type="submit">Rectify</button>

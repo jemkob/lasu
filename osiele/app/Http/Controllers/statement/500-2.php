@@ -3,8 +3,8 @@ if($major == $minor){
     $deptsummary = DB::table('results')
     ->leftjoin('departments', 'results.DepartmentID', '=', 'departments.DepartmantID')
     ->selectRaw('departments.DepartmentName as dname, departments.DepartmentCode as dcode, departments.DepartmantID as deptid')
-    ->where('results.Level', 300)
-    // ->whereRaw('results.level in ('.$level.', 200, 100)')
+    // ->where('results.Level', 300)
+    ->whereRaw('results.level in ('.$level.', 400, 300, 200, 100)')
 //     ->where('results.SessionID', $session)
     ->where('results.SubjectCombinID', $resultslip[0]->SubjectCombinID)
     ->where('results.matricno', $matricno)
@@ -17,8 +17,8 @@ if($major == $minor){
             $deptsummary = DB::table('results')
             ->leftjoin('departments', 'results.DepartmentID', '=', 'departments.DepartmantID')
             ->selectRaw('departments.DepartmentName as dname, departments.DepartmentCode as dcode, departments.DepartmantID as deptid')
-            ->where('results.Level', 300)
-            // ->whereRaw('results.level in ('.$level.', 200, 100)')
+            // ->where('results.Level', 300)
+            ->whereRaw('results.level in ('.$level.', 400, 300, 200, 100)')
         //     ->where('results.SessionID', $session)
             ->where('results.SubjectCombinID', $resultslip[0]->SubjectCombinID)
             ->where('results.matricno', $matricno)
@@ -167,34 +167,33 @@ if(isset($bedas) && !empty($bedas)){
     }else{
             $bed='BES';
     }
-    $compulsorycourses300 = DB::table('allcombineds')
-    ->leftjoin('subjects', 'allcombineds.subjectid', '=', 'subjects.subjectid')
-    ->select('subjects.subjectcode as subjectcodeco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', 'allcombineds.departmentid as deptid')
+    $compulsorycourses300 = DB::table('allcombinedcourses')
+    ->select('allcombinedcourses.subjectcode as subjectcodeco', 'allcombinedcourses.subjectvalue as subjectunitco', 'allcombinedcourses.subjectunit as subjectvalueco', 'allcombinedcourses.departmentid as deptid')
     ->where('SubjectCombineID', $programme)
-    ->where('CurricullumID', 1)
-    ->where('subjects.SubjectLevel', $level)
-    // ->where('subjects.Semester', $semester01)
-    ->where('subjects.subjectunit', 'C')
-    ->where('subjects.subjectcode', 'like', $bed.'%');
+//     ->where('CurricullumID', 1)
+    ->where('allcombinedcourses.SubjectLevel', 300)
+    ->where('sessionid', $session)
+    ->where('allcombinedcourses.subjectunit', 'C')
+    ->where('allcombinedcourses.subjectcode', 'like', $bed.'%');
 } else {
-$compulsorycourses300 = DB::table('allcombineds')
-->leftjoin('subjects', 'allcombineds.subjectid', '=', 'subjects.subjectid')
-->select('subjects.subjectcode as subjectcodeco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', 'allcombineds.departmentid as deptid')
+$compulsorycourses300 = DB::table('allcombinedcourses')
+->select('allcombinedcourses.subjectcode as subjectcodeco', 'allcombinedcourses.subjectvalue as subjectunitco', 'allcombinedcourses.subjectunit as subjectvalueco', 'allcombinedcourses.departmentid as deptid')
 ->where('SubjectCombineID', $programme)
-->where('CurricullumID', 1)
-->where('subjects.SubjectLevel', $level)
+->where('sessionid', $session)
+// ->where('CurricullumID', 1)
+->where('allcombinedcourses.SubjectLevel', 300)
 // ->where('subjects.Semester', $semester01)
-->where('subjects.subjectunit', 'C');
+->where('allcombinedcourses.subjectunit', 'C');
 }
 // return $compulsorycourses;
 //200 level
-$compulsorycourses = DB::table('allcombineds')
-->leftjoin('subjects', 'allcombineds.subjectid', '=', 'subjects.subjectid')
-->select('subjects.subjectcode as subjectcodeco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', 'allcombineds.departmentid as deptid')
+$compulsorycourses = DB::table('allcombinedcourses')
+->select('allcombinedcourses.subjectcode as subjectcodeco', 'allcombinedcourses.subjectvalue as subjectunitco', 'allcombinedcourses.subjectunit as subjectvalueco', 'allcombinedcourses.departmentid as deptid')
 ->where('SubjectCombineID', $programme)
-->where('CurricullumID', 1)
-->where('subjects.SubjectLevel', $level-100)
+// ->where('CurricullumID', 1)
+->where('allcombinedcourses.SubjectLevel', 200)
+->where('sessionid', $session-1)
 // ->where('subjects.Semester', $semester01)
-->where('subjects.subjectunit', 'C')
+->where('allcombinedcourses.subjectunit', 'C')
 ->union($compulsorycourses300)
 ->get();

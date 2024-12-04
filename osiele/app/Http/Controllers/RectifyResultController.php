@@ -29,14 +29,12 @@ class RectifyResultController extends Controller
 
         $matricno = $request->input('matricno');
         $thesession = $request->input('sessions');
-        $semester = $request->input('semester');
         $results = DB::table('results')
-        ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
-        ->leftjoin('students', 'results.studentid', '=', 'students.studentid')
-        ->select('subjects.SubjectValue as tnu', 'results.CA as CA', 'results.matricno as matricno', 'results.ResultID as resultid', 'results.sessionid as sessionid','results.semester as Semester', 'results.EXAM as EXAM', 'subjects.SubjectCode as SubjectCode',  'subjects.SubjectCode as SubjectCode', 'subjects.SubjectName as SubjectName', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename', 'students.major as major', 'students.minor as minor')
+        ->leftjoin('courses', 'results.SubjectID', '=', 'courses.ID')
+        ->leftjoin('students', 'results.matricno', '=', 'students.matricno')
+        ->select('courses.courseunit as tnu', 'results.CA as CA', 'results.matricno as matricno', 'results.ResultID as resultid', 'results.sessionid as sessionid', 'results.EXAM as EXAM', 'courses.courseCode as SubjectCode',  'courses.coursetitle as SubjectName', 'students.surname as surname', 'students.firstname as firstname', 'students.middlename as middlename')
         ->where('results.MatricNo', $matricno)
         ->where('sessionid', $thesession)
-        ->where('results.Semester', $semester)
         ->get();
         // return $results;
        /*  $pdf = PDF::loadView('rectifyresult.index', compact('results', 'sessions'));
@@ -105,9 +103,9 @@ class RectifyResultController extends Controller
         $sessions = DB::table('sessions')->get();
 
         $results = DB::table('results')
-        ->leftjoin('subjects', 'results.SubjectID', '=', 'subjects.SubjectID')
+        ->leftjoin('courses', 'courses.ID', '=', 'results.SubjectID')
         ->leftjoin('sessions', 'results.SessionID', '=', 'sessions.SessionID')
-        ->select('subjects.SubjectValue as tnu', 'results.CA as CA', 'results.matricno as matricno', 'results.ResultID as resultid', 'results.sessionid as sessionid','results.semester as Semester', 'results.EXAM as EXAM', 'subjects.SubjectCode as SubjectCode',  'subjects.SubjectCode as SubjectCode', 'subjects.SubjectName as SubjectName')
+        ->select('courses.courseunit as tnu', 'results.CA as CA', 'results.matricno as matricno', 'results.ResultID as resultid', 'results.sessionid as sessionid', 'results.EXAM as EXAM', 'courses.courseCode as SubjectCode',  'courses.coursetitle as SubjectName')
         ->where('ResultID', $id)->first();
         // return $results;
        /*  $pdf = PDF::loadView('rectifyresult.index', compact('results', 'sessions'));
@@ -128,10 +126,10 @@ class RectifyResultController extends Controller
         //
         $newca = $request->input('newca');
         $newexam = $request->input('newexam');
-        $oldca = $request->input('oldca');
-        $oldexam = $request->input('oldexam');
+        // $oldca = $request->input('oldca');
+        // $oldexam = $request->input('oldexam');
         $resultid = $request->input('resultid');
-        $reason = $request->input('reason');
+        // $reason = $request->input('reason');
         $course = $request->input('coursecode');
         $matricno = $request->input('matricno');
         $examca = $newca + $newexam;
@@ -146,9 +144,9 @@ class RectifyResultController extends Controller
         ->where('matricno', $getresult->MatricNo)
         ->first();
 
-            if($examca > 39 && !empty($curResult->MatricNo)){
-                DB::table('results')->where('ResultID', $curResult->ResultID)->delete();
-            }
+            // if($examca > 39 && !empty($curResult->MatricNo)){
+            //     DB::table('results')->where('ResultID', $curResult->ResultID)->delete();
+            // }
             if($examca > 100){
                 return redirect('/rectify')->with('error', 'CA and EXAM cannot be more than 100, check your input and enter the correct score');
             }
@@ -156,13 +154,13 @@ class RectifyResultController extends Controller
             ->where('resultID', $resultid)
             ->update(['CA' => $newca, 'EXAM' => $newexam]);
 
-            $info = 'Reason: '.$reason.'<br>';
-            $info .= 'MatricNo: '.$matricno.', Course Code: '.$course.', ResultID: '.$resultid.'.<br>';
-            $info .= 'Old Score, CA = '.$oldca.', EXAM = '.$oldexam.'.<br>';
-            $info .= 'New Score, CA = '.$newca.', EXAM = '.$newexam.'.<br>';
-            $info .= 'IP Address: '.$_SERVER['REMOTE_ADDR'];
+            // $info = 'Reason: '.$reason.'<br>';
+            // $info .= 'MatricNo: '.$matricno.', Course Code: '.$course.', ResultID: '.$resultid.'.<br>';
+            // $info .= 'Old Score, CA = '.$oldca.', EXAM = '.$oldexam.'.<br>';
+            // $info .= 'New Score, CA = '.$newca.', EXAM = '.$newexam.'.<br>';
+            // $info .= 'IP Address: '.$_SERVER['REMOTE_ADDR'];
 
-            DB::table('auditlive')->insert(['UserName' => Auth::user()->Username, 'Activity' => 'Rectify Score', 'Info' => $info ]);
+            // DB::table('auditlive')->insert(['UserName' => Auth::user()->Username, 'Activity' => 'Rectify Score', 'Info' => $info ]);
         
             
             return redirect('/rectify')->with('success', 'Result rectified');

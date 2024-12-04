@@ -30,13 +30,13 @@ Route::group(['middleware' => 'auth'], function(){
 Route::post('student/AddOlevel', 'OlevelController@AddOlevel');
 Route::post('student/AddJamb', 'OlevelController@AddJamb');
 Route::get('student/level', 'OlevelController@thelevel');
-//student result page by semester
-Route::get('student/resultbysemester', 'ResultController@thelevel');
-Route::post('student/semesterresult', 'ResultController@ResultBySemester');
+// //student result page by semester
+// Route::get('student/resultbysemester', 'ResultController@thelevel');
+// Route::post('student/semesterresult', 'ResultController@ResultBySemester');
 
-//student result page by level
-Route::get('student/resultbylevel', 'ResultController@thelevel2');
-Route::post('student/levelresult', 'ResultController@ResultBylevel');
+// //student result page by level
+// Route::get('student/resultbylevel', 'ResultController@thelevel2');
+// Route::post('student/levelresult', 'ResultController@ResultBylevel');
 
 //getting student carryover
 Route::get('student/carryover', 'ResultController@CarryOver');
@@ -55,9 +55,16 @@ Route::resource('student/courseform', 'CourseformController');
 Route::get('student/olevel', 'OlevelController@getOlevel');
 
 Route::post('student/registercourse', 'CourseRegistrationController@RegisterCourseform');
+Route::get('student/check', 'CourseRegistrationController@checkpayment');
+Route::get('student/checks', 'CourseRegistrationController@checkpayments');
+
 Route::resource('student/courseregistration', 'CourseRegistrationController');
 
-Route::get('student/payment', 'PaymentController@payment');  
+// Route::get('student/payment', 'PaymentController@payment'); 
+// Route::get('student/payment', 'PaymentController@payment')->name('payments');  
+Route::get('student/payment', 'PaymentController@payment')->name('payments');  
+Route::post('student/verifypayment', 'PaymentController@verifyPayment')->name('verifypayment');
+Route::get('student/printreceipt', 'PaymentController@printreceipt')->name('printreceipt');   
 
 
 
@@ -87,3 +94,11 @@ Route::get('jsonstates', 'InvoiceController@jsstates');
 Route::get('student/invoice', 'InvoiceController@invoice');
 Route::post('student/postinvoice', 'InvoiceController@postinvoice');
 Route::get('student/showinvoice', 'InvoiceController@showinvoice');
+
+Route::get('/clearcache', function() {
+    $exitCode = Artisan::call('cache:clear');
+    // $exitCode =Artisan::call('route:cache');
+    $exitCode =Artisan::call('config:cache');
+    $exitCode =Artisan::call('view:clear');
+    return 'Application cache cleared';
+});

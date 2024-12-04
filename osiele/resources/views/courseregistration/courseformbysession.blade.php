@@ -46,7 +46,7 @@
        
 
     <table class="table table-striped" style="text-transform:uppercase;" width="70%">
-        <tr><td class="alert alert-success"><h3>{{$courseview[0]->surname.' '.$courseview[0]->firstname.' '.$courseview[0]->middlename}} ({{$courseview[0]->major.'/'.$courseview[0]->minor}}) {{$courseview[0]->matricno}} [{{$currentsession->SessionYear}}]</h3></td></tr>
+        <tr><td class="alert alert-success"><h3>{{$courseview[0]->surname.' '.$courseview[0]->firstname.' '.$courseview[0]->middlename}} {{$courseview[0]->matricno}} [{{$currentsession->SessionYear}}]</h3></td></tr>
       </table>
       <form name="form1" method="post" action="{{url('courseregistration/deletecourse')}}">
                         {{csrf_field()}}
@@ -109,13 +109,15 @@
                         <select class="form-control" name="addsubject" id="addsubject">
                             <option value="0" disable="true" selected="true">-- Select Course To Add --</option>
                               @foreach ($subjects as $key => $value)
-                                <option value="{{$value->SubjectID}}">{{ $value->SubjectCode.' -  '.$value->SubjectName }}</option>
+                                <option value="{{$value->CourseID}}">{{ $value->CourseCode.' -  '.$value->CourseTitle }}</option>
                               @endforeach
                           </select>
                           <input type="hidden" name="details" id="details" value="{{$courseview[0]->resultid}}">
                           <input type="hidden" name="matric" id="matric" value="{{$courseview[0]->matricno}}">
                           <input type="hidden" name="studentid" id="studentid" value="{{$courseview[0]->studentid}}">
                           <input type="hidden" name="resultid" id="resultid" value="{{$courseview[0]->resultid}}">
+                          <input type="hidden" name="matricno" id="matricno" value="{{$courseview[0]->matricno}}">
+                          <input type="hidden" name="department" id="department" value="{{$courseview[0]->departmentid}}">
                           <input type="hidden" name="cursession" id="cursession" value="{{$courseview[0]->sessionid}}">
                           <input type="hidden" name="resultlevel" id="resultlevel" value="{{$courseview[0]->resultlevel}}">
                         </td>

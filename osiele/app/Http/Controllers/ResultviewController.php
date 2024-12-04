@@ -127,6 +127,8 @@ class ResultviewController extends Controller
         ->where('matricno', $matricno)
         ->first();
 
+        $studentid = $student->StudentID;
+
         $thesession = DB::table('sessions')->where('sessionid', $session)->first();
         
         $major = $student->Major;
@@ -140,7 +142,7 @@ class ResultviewController extends Controller
         // $minor = substr($subcom->SubjectCombinName, -3);
         
 
-        $resultslip = DB::table('results')
+        /* $resultslip = DB::table('results')
         ->leftjoin('subjects', 'results.subjectid', '=', 'subjects.subjectid')
         ->select('results.*', 'subjects.subjectname as SubjectName', 'subjects.subjectcode as SubjectCode')
         // ->leftjoin('allcombinedcourses', 'results.subjectcombinid', '=', 'allcombinedcourses.subjectcombineid')
@@ -151,7 +153,22 @@ class ResultviewController extends Controller
         // ->where('allcombinedcourses.sessionid', $session)
         // ->where('allcombinedcourses.subjectcombineid', $subcom->SubjectCombinID)
         // ->groupby('results.resultid')
+        ->get(); */
+
+        $resultslip = DB::table('results')
+        ->leftjoin('allcombinedcourses', 'results.subjectid', '=', 'allcombinedcourses.subjectid')
+        ->select('results.*', 'allcombinedcourses.subjectname as SubjectName', 'allcombinedcourses.subjectcode as SubjectCode')
+        // ->leftjoin('allcombinedcourses', 'results.subjectcombinid', '=', 'allcombinedcourses.subjectcombineid')
+        ->where('results.sessionid', $session)
+        ->where('results.level', $level)
+        ->where('results.semester', $semester)
+        ->where('results.studentid', $studentid)
+        ->where('allcombinedcourses.sessionid', $session)
+        // ->where('allcombinedcourses.subjectlevel', $level)
+        ->where('allcombinedcourses.subjectcombineid', $subcom->SubjectCombinID)
+        // ->groupby('results.resultid')
         ->get();
+
         if(count($resultslip) < 1){
             return redirect('/resultslipindex')->with('error', 'Error: Incorrect Information!');
         }
@@ -162,7 +179,7 @@ class ResultviewController extends Controller
         ->where('results.sessionid', $session)
         ->where('results.level', $level)
         ->where('results.semester', $semester)
-        ->where('results.matricno', $matricno)
+        ->where('results.studentid', $studentid)
         ->get();
         
        
@@ -172,17 +189,36 @@ class ResultviewController extends Controller
         $sessions = DB::table('sessions')->get();
 
         //compulsory courses
+    //     if($_SERVER['REMOTE_ADDR'] == '41.223.65.6'){
+    //         // if($_SERVER['REMOTE_ADDR'] != '41.242.66.117' ){
+    //             // return redirect(url()->previous())->with('error', 'Registration closed.'); 
+           
+    //     $compulsorycourses = DB::table('allcombinedcourses')
+    //     ->leftjoin('subjects', 'allcombinedcourses.subjectid', '=', 'subjects.subjectid')
+    //     ->select('subjects.subjectcode as subjectcodeco', 'subjects.subjectname as subjectnameco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', 'subjects.subjectlevel as subjectlevel', 'subjects.semester as semester')
+    //     ->where('SubjectCombineID', $resultslip[0]->SubjectCombinID)
+    //     // ->where('CurricullumID', 2)
+    //     ->where('subjects.SubjectLevel', $level)
+    //     ->where('sessionid', $session)
+    //     ->where('subjects.Semester', $semester)
+    //     ->where('subjects.subjectunit','!=', 'R')
+    //     // ->where('subjects.subjectunit', 'E')
+    //     ->orderby('subjects.subjectcode')
+    //     ->get(); 
+
+    //     return $compulsorycourses;
+    // }
+
         $compulsorycourses = DB::table('allcombinedcourses')
-        ->leftjoin('subjects', 'allcombinedcourses.subjectid', '=', 'subjects.subjectid')
-        ->select('subjects.subjectcode as subjectcodeco', 'subjects.subjectname as subjectnameco', 'subjects.subjectvalue as subjectunitco', 'subjects.subjectunit as subjectvalueco', 'subjects.subjectlevel as subjectlevel', 'subjects.semester as semester')
+        // ->leftjoin('subjects', 'allcombinedcourses.subjectid', '=', 'subjects.subjectid')
+        ->select('allcombinedcourses.subjectcode as subjectcodeco', 'allcombinedcourses.subjectvalue as subjectunitco', 'allcombinedcourses.subjectname as subjectnameco', 'allcombinedcourses.subjectunit as subjectvalueco', 'allcombinedcourses.subjectlevel as subjectlevel', 'allcombinedcourses.semester as semester')
         ->where('SubjectCombineID', $resultslip[0]->SubjectCombinID)
-        // ->where('CurricullumID', 2)
-        ->where('subjects.SubjectLevel', $level)
         ->where('sessionid', $session)
-        ->where('subjects.Semester', $semester)
-        ->where('subjects.subjectunit','!=', 'R')
-        // ->where('subjects.subjectunit', 'E')
-        ->orderby('subjects.subjectcode')
+        ->where('allcombinedcourses.SubjectLevel', $level)
+        ->where('allcombinedcourses.sessionid', $session)
+        // ->where('subjects.Semester', $semester01)
+        ->where('allcombinedcourses.subjectvalue','!=', 0)
+        ->where('allcombinedcourses.subjectunit', 'C')
         ->get();
 
         
@@ -216,6 +252,10 @@ class ResultviewController extends Controller
             include('resultslip/400-1.php');
         } elseif(($level=='400') && ($semester =='2')){
             include('resultslip/400-2.php');
+        } elseif(($level=='500') && ($semester =='1')){
+            include('resultslip/500-1.php');
+        } elseif(($level=='500') && ($semester =='2')){
+            include('resultslip/500-2.php');
         }
         
 
@@ -303,6 +343,10 @@ class ResultviewController extends Controller
             include('statement/400-2.php');
         } elseif(($level=='400') && ($semester =='2')){
             include('statement/400-2.php');
+        } elseif(($level=='500') && ($semester =='1')){
+            include('statement/500-2.php');
+        } elseif(($level=='500') && ($semester =='2')){
+            include('statement/500-2.php');
         }
 
         // return $resultslip[0]->SubjectCombinID;
@@ -326,7 +370,7 @@ class ResultviewController extends Controller
         // $semester = $request->input('semester');
 
         $student = DB::table('results')
-        ->select('students.firstname as Firstname', 'students.surname as Surname', 'students.middlename as Middlename', 'students.matricno as MatricNo', 'results.level as Level', 'students.subcourse as subcourse', 'students.studentid as StudentID')
+        ->select('students.firstname as Firstname', 'students.surname as Surname', 'students.middlename as Middlename', 'students.matricno as MatricNo', 'results.level as Level', 'students.studentid as StudentID')
         ->leftjoin('students', 'results.matricno', '=', 'students.matricno')
         ->where('results.matricno', $matricno)
         ->orderby('Level', 'desc')
@@ -388,6 +432,9 @@ class ResultviewController extends Controller
         } elseif($level=='400') {
             include('transcript/400-2.php');
             // return $prevsummary;
+        } elseif($level=='500') {
+            include('transcript/500-2.php');
+            // return $prevsummary;
         }
 
         // return $deptsummary;
@@ -430,7 +477,7 @@ class ResultviewController extends Controller
         // $semester = $request->input('semester');
 
         $student = DB::table('results')
-        ->select('students.firstname as Firstname', 'students.surname as Surname', 'students.middlename as Middlename', 'students.matricno as MatricNo', 'results.level as Level', 'students.subcourse as subcourse', 'students.studentid as StudentID')
+        ->select('students.firstname as Firstname', 'students.surname as Surname', 'students.middlename as Middlename', 'students.matricno as MatricNo', 'results.level as Level', 'students.studentid as StudentID')
         ->leftjoin('students', 'results.matricno', '=', 'students.matricno')
         ->where('results.matricno', $matricno)
         ->orderby('Level', 'desc')
@@ -442,20 +489,24 @@ class ResultviewController extends Controller
 
 
         $resultcheck = DB::table('results')->where('matricno', $matricno)->max('level');
+        $combinationid = DB::table('results')->where('matricno', $matricno)->first();
 
 
         $level = $student->Level;
 
         // $thesession = DB::table('sessions')->where('sessionid', $session)->first();
-
+        
         $academicstanding = DB::table('results')
-        ->leftjoin('subjects', 'results.subjectid', '=', 'subjects.subjectid')
+        ->leftjoin('allcombinedcourses', 'results.subjectid', '=', 'allcombinedcourses.subjectid')    
         ->leftjoin('sessions', 'results.sessionid', '=', 'sessions.sessionid')
-        ->select('results.*','sessions.*', 'subjects.subjectname as SubjectName', 'subjects.subjectcode as SubjectCode')
+        ->select('results.*', 'sessions.*', 'allcombinedcourses.subjectname as SubjectName', 'allcombinedcourses.subjectcode as SubjectCode', 'allcombinedcourses.sessionid as csession', 'allcombinedcourses.subjectvalue as aSubjectValue', 'allcombinedcourses.subjectunit as aSubjectUnit')
+        // ->select('results.*','sessions.*', 'subjects.subjectname as SubjectName', 'subjects.subjectcode as SubjectCode')
         // ->where('results.sessionid', '<=', $session)
         // ->where('results.level', $level)
         // ->where('results.semester', $semester)
         ->where('results.matricno', $matricno)
+        // ->where('allcombinedcourses.sessionid', $sess)
+        ->where('allcombinedcourses.subjectcombineid', $combinationid->SubjectCombinID)
         ->get();
 // dd($level);
         
@@ -578,6 +629,59 @@ class ResultviewController extends Controller
 
     }
 
+    public function uploadedscorelevelindex(){
+        $program = DB::table('subjectcombinations')->get();
+        $sessions = DB::table('sessions')->get();
+        return view('resultviewer.uploadedscorelevel')->with('program', $program)->with('sessions', $sessions);
+    }
+
+    public function uploadedscorelevel(Request $request){
+        $session=$request->input('sessions');
+        $programmes = $request->input('program');
+        $firstscore = $request->input('firstscore');
+        $lastscore = $request->input('lastscore');
+        $level = $request->input('level');
+        $semester = $request->input('semester');
+
+        $uploadedscore = DB::table('results')
+        ->leftjoin('subjects', 'results.subjectid', '=', 'subjects.subjectid')
+        ->leftjoin('subjectcombinations', 'results.subjectcombinid', '=', 'subjectcombinations.SubjectCombinID')
+        ->leftjoin('lecturerprofiles', 'results.subjectid', '=', 'lecturerprofiles.subjectid')
+        ->leftjoin('lecturers', 'lecturerprofiles.lecturerid', '=', 'lecturers.lecturerid')
+        ->select('lecturers.surname as surname', 'lecturers.firstname as firstname', 'results.matricno as matricno', 'subjectcombinations.SubjectCombinName as program', 'subjects.subjectcode as subjectcode', 'results.subjectid as subjectid',  DB::raw('count(results.matricno) as total'))
+        ->where('sessionid', $session)
+        // ->where('results.subjectCombinID', $programmes)
+        ->where('results.level', $level)
+        ->where('results.semester', $semester)
+        ->where('results.ca', 0)
+        ->where('results.exam', 0)
+        ->groupby('results.subjectid')
+        //->havingRaw('results.ca + results.exam between ? and ?', [$firstscore, $lastscore])
+        // ->wherebetween('results.ca + results.exam', [$firstscore, $lastscore])
+        ->get();
+
+        $allcourse = DB::table('results')
+        ->leftjoin('subjects', 'results.subjectid', '=', 'subjects.subjectid')
+        ->leftjoin('subjectcombinations', 'results.subjectcombinid', '=', 'subjectcombinations.SubjectCombinID')
+        ->select('subjects.subjectcode as subjectcode', 'results.subjectid as subjectid', DB::raw('count(results.matricno) as total'))
+        ->where('sessionid', $session)
+        // ->where('results.subjectCombinID', $programmes)
+        ->where('results.level', $level)
+        ->where('results.semester', $semester)
+        // ->where('results.ca', 0)
+        // ->where('results.exam', 0)
+        ->groupby('results.subjectid')
+        //->havingRaw('results.ca + results.exam between ? and ?', [$firstscore, $lastscore])
+        // ->wherebetween('results.ca + results.exam', [$firstscore, $lastscore])
+        ->get();
+        // return $allcourse;
+
+        $program = DB::table('subjectcombinations')->get();
+        $sessions = DB::table('sessions')->get();
+        return view('resultviewer.uploadedscorelevel')->with('program', $program)->with('sessions', $sessions)->with('uploadedscore', $uploadedscore)->with('allcourse', $allcourse);
+
+    }
+
     public function addanf(){
         $getuser = DB::table('students')->select('studentid', 'matricno')->where('registered', 'True')->where('major', 'ANF')->where('minor', 'ANF')->where('level', 200)->get();
         foreach($getuser as $gu){
@@ -641,8 +745,8 @@ class ResultviewController extends Controller
     }
 
     public function uploadresultindex(){
-        $subjects = DB::table('subjects')
-            ->select('subjects.SubjectID as subjectid', 'subjects.SubjectCode as subjectcode')
+        $subjects = DB::table('courses')
+            // ->select('subjects.SubjectID as subjectid', 'subjects.SubjectCode as subjectcode')
             ->get();
             // return $subjects;
 
@@ -662,33 +766,61 @@ class ResultviewController extends Controller
         //file name and time
         $filetostore = $filename.'_'.date("Y-m-d-h-i-sa", time()).'.'.$thefileExt;
 
-        $getcourse = DB::table('subjects')->where('subjectid', $subjectupload)->first();
+        $getcourse = DB::table('courses')->where('id', $subjectupload)->first();
         // if(strlen($getcourse->SubjectCode) > 7){
         //     $coursefilename = substr($thefile, 0, 10);
         // } else {
         //     $coursefilename = substr($thefile, 0, 7);
         // }
-        $coursestrlen = strlen($getcourse->SubjectCode);
+        $coursestrlen = strlen($getcourse->CourseCode);
         $coursefilename = substr($thefile, 0, $coursestrlen);
         // $getcourse = DB::table('subjects')->where('subjectid', $subjectupload)->first();
+        
 
-        if(trim($coursefilename) !== ($getcourse->SubjectCode)) {
 
-            return redirect('lecturer/resultupload')->with('error', 'Sorry the file selected does not match the course selected. You selected "'.$thefile.'" for '.$getcourse->SubjectCode.'.  Kindly follow this order, if course name is e.g. CHE 112, then the file name must begin with CHE 112.');
+        if(trim($coursefilename) !== ($getcourse->CourseCode)) {
+
+            return redirect('uploadresultindex')->with('error', 'Sorry the file selected does not match the course selected. You selected "'.$thefile.'" for '.$getcourse->CourseCode.'.  Kindly follow this order, if course name is e.g. CHE 112, then the file name must begin with CHE 112.');
         }
                 $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
+
+//                 Excel::load($path)->each(function (Collection $csvLine) use($subjectupload) {
+//                     $dept = $csvLine->get('departmentid');
+//                     $level = $csvLine->get('level');
+
+//                     $checkcourse = DB::table('results')->where('subjectid', $subjectupload)->where('departmentid', $dept)->where('level', $level)->get();
+                    
+//                     if(count($checkcourse) > 0) {
+//                         // dd(count($checkcourse).' yes here upppp');
+//                         return redirect()->back()->with('error', 'Sorry the file has already been uploaded.');
+//                     }
+//                     return 'done';
+                        
+//                });
+// dd('no way here o');
                 Excel::load($path)->each(function (Collection $csvLine) use($subjectupload) {
                     $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
                     // $lecturerid = Auth::user()->LecturerID;
                     $csvca = $csvLine->get('ca');//ca
                     $csvexam = $csvLine->get('exam');//exam
+                    $matricno = $csvLine->get('matricno');//exam
+                    $dept = $csvLine->get('department');
+                    $level = $csvLine->get('level');
                     if($csvca == '' || $csvca == NULL){
                         $csvca = 0;
                     }
                     if($csvexam == '' || $csvexam == NULL){
                         $csvexam = 0;
                     }
+
+                    // $checkcourse = DB::table('results')->where('subjectid', $subjectupload)->where('departmentid', $dept)->where('level', $level)->get();
                     
+                    // dd(count($checkcourse).' yes here');
+                    // if($checkcourse && count($checkcourse) > 0) {
+
+                    //     return redirect('uploadresultindex')->with('error', 'Sorry the file has already been uploaded.');
+                    // }
+                    // return 'done';
                     /* DB::table('results')
                         ->where('results.MatricNo', $csvLine->get('matricno'))
                         ->where('results.SubjectID', $subjectupload)
@@ -697,19 +829,177 @@ class ResultviewController extends Controller
                         ->orWhere('results.EXAM', 0)
                         //->where('SubjectID', $subjectupload)
                         ->update(['CA' => $csvLine->get('ca'),'EXAM' => $csvLine->get('exam')]); */
-                    if($csvLine->get('resultid') !== null){
+                    // if($csvLine->get('resultid') !== null){
                         //do something
-                        DB::table('results')
-                        ->where('results.resultid', $csvLine->get('resultid'))
-                        ->where('results.EXAM', 0)
-                        ->where('results.CA', 0)                        
-                        ->update(['CA' => $csvca,'EXAM' => $csvexam, 'LecturerInserted' => 'TRUE', 'uploaded_by' => 'Admin']);
-                    }
+                        if($level == 100){
+                            DB::table('results')
+                            ->insert(['CA' => $csvca,'EXAM' => $csvexam, 'departmentid'=> $dept, 'level'=>$level,'matricno'=>$matricno, 'LecturerInserted' => 'TRUE', 'uploaded_by' => 'Admin', 'subjectid'=>$subjectupload]); 
+                        } elseif($level == 200){
+                            DB::table('results')
+                        ->insert(['CA' => $csvca,'EXAM' => $csvexam, 'departmentid'=> $dept, 'level'=>$level,'matricno'=>$matricno, 'LecturerInserted' => 'TRUE', 'uploaded_by' => 'Admin', 'subjectid'=>$subjectupload, 'sessionid'=>2]);
+                        } elseif ($level == 300) {
+                            DB::table('results')
+                        ->insert(['CA' => $csvca,'EXAM' => $csvexam, 'departmentid'=> $dept, 'level'=>$level,'matricno'=>$matricno, 'LecturerInserted' => 'TRUE', 'uploaded_by' => 'Admin', 'subjectid'=>$subjectupload, 'sessionid'=>3]);
+                        } elseif ($level == 400) {
+                            DB::table('results')
+                        ->insert(['CA' => $csvca,'EXAM' => $csvexam, 'departmentid'=> $dept, 'level'=>$level,'matricno'=>$matricno, 'LecturerInserted' => 'TRUE', 'uploaded_by' => 'Admin', 'subjectid'=>$subjectupload, 'sessionid'=>4]);
+                        } elseif ($level == 500) {
+                            DB::table('results')
+                        ->insert(['CA' => $csvca,'EXAM' => $csvexam, 'departmentid'=> $dept, 'level'=>$level,'matricno'=>$matricno, 'LecturerInserted' => 'TRUE', 'uploaded_by' => 'Admin', 'subjectid'=>$subjectupload, 'sessionid'=>5]);
+                        }
+                    // \}
                         
                });
                //result file on
                $path = $request->file('imported-file')->storeAs('public/osresults', $filetostore);
-        return redirect('uploadresultindex')->with('success','Upload Successful.');
+        return redirect('uploadresultindex')->with('success', $getcourse->CourseCode.' Upload Successful.');
+       }
+    }
+
+    public function uploadresultcourse(Request $request)
+    {
+        
+      if($request->file('imported-file'))
+      {
+       $subjectupload = $request->input('subject');//mustshow
+        $path = $request->file('imported-file')->getRealPath();
+        $thefile = $request->file('imported-file')->getClientOriginalName();
+        $thefileExt = $request->file('imported-file')->getClientOriginalExtension();
+        //GET only filename without extension
+        $filename = pathinfo($thefile, PATHINFO_FILENAME);
+        //file name and time
+        $filetostore = $filename.'_'.date("Y-m-d-h-i-sa", time()).'.'.$thefileExt;
+
+        // $getcourse = DB::table('courses')->where('id', $subjectupload)->first();
+        // if(strlen($getcourse->SubjectCode) > 7){
+        //     $coursefilename = substr($thefile, 0, 10);
+        // } else {
+        //     $coursefilename = substr($thefile, 0, 7);
+        // }
+        // $coursestrlen = strlen($getcourse->CourseCode);
+        // $coursefilename = substr($thefile, 0, $coursestrlen);
+        // $getcourse = DB::table('subjects')->where('subjectid', $subjectupload)->first();
+        
+
+
+        // if(trim($coursefilename) !== ($getcourse->CourseCode)) {
+
+        //     return redirect('uploadresultindex')->with('error', 'Sorry the file selected does not match the course selected. You selected "'.$thefile.'" for '.$getcourse->CourseCode.'.  Kindly follow this order, if course name is e.g. CHE 112, then the file name must begin with CHE 112.');
+        // }
+                $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
+
+//                 Excel::load($path)->each(function (Collection $csvLine) use($subjectupload) {
+//                     $dept = $csvLine->get('departmentid');
+//                     $level = $csvLine->get('level');
+
+//                     $checkcourse = DB::table('results')->where('subjectid', $subjectupload)->where('departmentid', $dept)->where('level', $level)->get();
+                    
+//                     if(count($checkcourse) > 0) {
+//                         // dd(count($checkcourse).' yes here upppp');
+//                         return redirect()->back()->with('error', 'Sorry the file has already been uploaded.');
+//                     }
+//                     return 'done';
+                        
+//                });
+// dd('no way here o');
+                Excel::load($path)->each(function (Collection $csvLine) use($subjectupload) {
+                    $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
+                    // $lecturerid = Auth::user()->LecturerID;
+                    $csvca = $csvLine->get('ca');//ca
+                    $csvexam = $csvLine->get('exam');//exam
+                    $matricno = $csvLine->get('matricno');//exam
+                    $dept = $csvLine->get('department');
+                    $level = $csvLine->get('level');
+                    $course = $csvLine->get('coursecode');
+                    if($csvca == '' || $csvca == NULL){
+                        $csvca = 0;
+                    }
+                    if($csvexam == '' || $csvexam == NULL){
+                        $csvexam = 0;
+                    }
+
+                    $checkcourse = DB::table('courses')->where('coursecode', 'like', '%'.trim($course).'%')->first();
+                    
+                    // dd($course);
+                    // if($checkcourse && count($checkcourse) > 0) {
+                    $subjectupload = $checkcourse->Id;
+                    //     return redirect('uploadresultindex')->with('error', 'Sorry the file has already been uploaded.');
+                    // }
+                    // return 'done';
+                    
+                    // if($csvLine->get('resultid') !== null){
+                        //do something
+                        if($level == 100){
+                            DB::table('results')
+                            ->insert(['CA' => $csvca,'EXAM' => $csvexam, 'departmentid'=> $dept, 'level'=>$level,'matricno'=>$matricno, 'LecturerInserted' => 'TRUE', 'uploaded_by' => 'Admin', 'subjectid'=>$subjectupload, 'sessionid'=>2]); 
+                        } elseif($level == 200){
+                            DB::table('results')
+                        ->insert(['CA' => $csvca,'EXAM' => $csvexam, 'departmentid'=> $dept, 'level'=>$level,'matricno'=>$matricno, 'LecturerInserted' => 'TRUE', 'uploaded_by' => 'Admin', 'subjectid'=>$subjectupload, 'sessionid'=>3]);
+                        } elseif ($level == 300) {
+                            DB::table('results')
+                        ->insert(['CA' => $csvca,'EXAM' => $csvexam, 'departmentid'=> $dept, 'level'=>$level,'matricno'=>$matricno, 'LecturerInserted' => 'TRUE', 'uploaded_by' => 'Admin', 'subjectid'=>$subjectupload, 'sessionid'=>4]);
+                        } elseif ($level == 400) {
+                            DB::table('results')
+                        ->insert(['CA' => $csvca,'EXAM' => $csvexam, 'departmentid'=> $dept, 'level'=>$level,'matricno'=>$matricno, 'LecturerInserted' => 'TRUE', 'uploaded_by' => 'Admin', 'subjectid'=>$subjectupload, 'sessionid'=>5]);
+                        } elseif ($level == 500) {
+                            DB::table('results')
+                        ->insert(['CA' => $csvca,'EXAM' => $csvexam, 'departmentid'=> $dept, 'level'=>$level,'matricno'=>$matricno, 'LecturerInserted' => 'TRUE', 'uploaded_by' => 'Admin', 'subjectid'=>$subjectupload, 'sessionid'=>6]);
+                        }
+                    // \}
+                        
+               });
+               //result file on
+               $path = $request->file('imported-file')->storeAs('public/osresults', $filetostore);
+        return redirect('uploadresultindex')->with('success', ' Upload Successful.');
+       }
+    }
+
+
+    public function uploadzeroresult(Request $request)
+    {
+        
+      if($request->file('imported-file'))
+      {
+       $subjectupload = $request->input('subject');//mustshow
+        $path = $request->file('imported-file')->getRealPath();
+        $thefile = $request->file('imported-file')->getClientOriginalName();
+        $thefileExt = $request->file('imported-file')->getClientOriginalExtension();
+        //GET only filename without extension
+        $filename = pathinfo($thefile, PATHINFO_FILENAME);
+        //file name and time
+        $filetostore = $filename.'_'.date("Y-m-d-h-i-sa", time()).'.'.$thefileExt;
+
+       
+                $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
+
+                Excel::load($path)->each(function (Collection $csvLine) use($subjectupload) {
+                    // $sessions = DB::table('sessions')->where('CurrentSession', true)->first();
+                    // $lecturerid = Auth::user()->LecturerID;
+                    $csvca = $csvLine->get('ca');//ca
+                    $csvexam = $csvLine->get('exam');//exam
+                    // $matricno = $csvLine->get('matricno');//exam
+                    // $dept = $csvLine->get('department');
+                    // $level = $csvLine->get('level');
+                    $resultid = $csvLine->get('resultid');
+                    if($csvca == '' || $csvca == NULL){
+                        $csvca = 0;
+                    }
+                    if($csvexam == '' || $csvexam == NULL){
+                        $csvexam = 0;
+                    }
+
+                    DB::table('results')
+                        ->where('resultid', $resultid)
+                        //->where('SubjectID', $subjectupload)
+                        ->update(['CA' => $csvLine->get('ca'),'EXAM' => $csvLine->get('exam')]);
+                    // if($csvLine->get('resultid') !== null){
+                        //do something
+                    // \}
+                        
+               });
+               //result file on
+            //    $path = $request->file('imported-file')->storeAs('public/osresults', $filetostore);
+        return redirect('uploadresultindex')->with('success',' Upload Successful.');
        }
     }
     /**
